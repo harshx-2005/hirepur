@@ -24,7 +24,41 @@ exports.register = async (req, res, next) => {
 
         const emailExists = await User.findByEmail(email);
         if (emailExists) {
-            return res.status(400).json({ success: false, message: 'Email already exists' });
+            if (emailExists.is_verified) {
+                return res.status(400).json({ success: false, message: 'Email already exists' });
+            }
+
+            // Otherwise, if the email exists but is NOT verified:
+            // 1. Update details with fresh inputs
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+            await pool.query(
+                'UPDATE USERS SET name = ?, password = ?, role = ? WHERE id = ?',
+                [name, hashedPassword, role, emailExists.id]
+            );
+
+            // 2. Safely verify/build profiles if missing
+            if (role === 'job_seeker') {
+                const [p] = await pool.query('SELECT id FROM JOB_SEEKER_PROFILE WHERE user_id = ?', [emailExists.id]);
+                if (p.length === 0) {
+                    await User.createJobSeekerProfile(emailExists.id);
+                }
+            } else if (role === 'employer') {
+                const [p] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [emailExists.id]);
+                if (p.length === 0) {
+                    await User.createEmployerProfile(emailExists.id, { company_name, company_website, company_size, industry, company_description, location });
+                }
+            }
+
+            // 3. Generate and dispatch a fresh OTP!
+            await otpService.generateAndSend(email, 'registration');
+
+            return res.status(201).json({
+                success: true,
+                message: 'Account pending verification. A fresh verification code has been dispatched.',
+                email,
+                requiresVerification: true
+            });
         }
 
         const salt = await bcrypt.genSalt(10);
