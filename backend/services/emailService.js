@@ -1,7 +1,10 @@
 const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
-    service: process.env.SMTP_SERVICE || 'gmail',
+    host: process.env.SMTP_SERVICE === 'gmail' || !process.env.SMTP_SERVICE ? 'smtp.gmail.com' : undefined,
+    port: process.env.SMTP_SERVICE === 'gmail' || !process.env.SMTP_SERVICE ? 587 : undefined,
+    secure: process.env.SMTP_SERVICE === 'gmail' || !process.env.SMTP_SERVICE ? false : undefined,
+    service: process.env.SMTP_SERVICE && process.env.SMTP_SERVICE !== 'gmail' ? process.env.SMTP_SERVICE : undefined,
     auth: {
         user: process.env.SMTP_USER || process.env.EMAIL_USER,
         pass: process.env.SMTP_PASS || process.env.EMAIL_PASS
