@@ -24,8 +24,42 @@ transporter.verify((error) => {
     }
 });
 
-const sendEmail = async ({ to, subject, html }) => {
-    // 1. If Resend API Key is configured, use the high-performance HTTP REST API to bypass SMTP network blocks!
+const sendEmail = async ({ to, subject, html, templateParams }) => {
+    // 1. If EmailJS is configured, use the EmailJS secure HTTP REST API! (Zero-dependency & bypasses SMTP blocks)
+    const emailJsServiceId = process.env.EMAILJS_SERVICE_ID || 'service_9r20tjd';
+    const emailJsTemplateId = process.env.EMAILJS_TEMPLATE_ID || 'template_ai4pjmn';
+    const emailJsPublicKey = process.env.EMAILJS_PUBLIC_KEY || 'mZHBTWxhLXWOyxmnS';
+    const emailJsPrivateKey = process.env.EMAILJS_PRIVATE_KEY || 'KhjFProsPfOTPFpVYFCR2';
+
+    if (emailJsServiceId && emailJsTemplateId && emailJsPublicKey && templateParams) {
+        try {
+            const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    service_id: emailJsServiceId,
+                    template_id: emailJsTemplateId,
+                    user_id: emailJsPublicKey,
+                    accessToken: emailJsPrivateKey || undefined, // Securely signs the server-side request
+                    template_params: templateParams
+                })
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || `HTTP Status ${response.status}`);
+            }
+            console.log(`📧 EmailJS HTTP API successfully dispatched email to ${to}`);
+            return { success: true };
+        } catch (error) {
+            console.error('📧 EmailJS HTTP dispatch error:', error.message);
+            // Fallback to Resend or NodeMailer if this fails
+        }
+    }
+
+    // 2. If Resend API Key is configured, use the high-performance HTTP REST API to bypass SMTP network blocks!
     if (process.env.RESEND_API_KEY) {
         try {
             const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
@@ -51,11 +85,10 @@ const sendEmail = async ({ to, subject, html }) => {
             return data;
         } catch (error) {
             console.error('📧 Resend HTTP dispatch error:', error.message);
-            throw new Error('Failed to dispatch verification email via Resend');
         }
     }
 
-    // 2. Fallback to standard SMTP (NodeMailer) if Resend is not configured
+    // 3. Fallback to standard SMTP (NodeMailer)
     try {
         const mailOptions = {
             from: `"HirePur Team" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
@@ -133,7 +166,14 @@ const sendOtpEmail = async (email, otp, type = 'registration') => {
     return sendEmail({
         to: email,
         subject: `[HirePur] ${title} - OTP: ${otp}`,
-        html: htmlContent
+        html: htmlContent,
+        templateParams: {
+            to_email: email,
+            subject: `[HirePur] ${title} - OTP: ${otp}`,
+            title: title,
+            message_text: messageText,
+            otp_code: otp
+        }
     });
 };
 
