@@ -34,14 +34,15 @@ const otpService = {
             [email, hashedOtp, expiresAt, type]
         );
 
-        // 4. Send email in background
-        try {
-            await sendOtpEmail(email, otpCode, type);
-            console.log(`📧 OTP successfully dispatched to ${email}`);
-        } catch (mailError) {
-            console.error(`📧 [SMTP FALLBACK] Mail dispatch failed: ${mailError.message}`);
-            console.log(`🔑 [TESTING OTP CODE]: ${otpCode} (For email: ${email})`);
-        }
+        // 4. Send email in background (non-blocking)
+        sendOtpEmail(email, otpCode, type)
+            .then(() => {
+                console.log(`📧 OTP successfully dispatched to ${email}`);
+            })
+            .catch((mailError) => {
+                console.error(`📧 [SMTP FALLBACK] Mail dispatch failed: ${mailError.message}`);
+                console.log(`🔑 [TESTING OTP CODE]: ${otpCode} (For email: ${email})`);
+            });
 
         return true;
     },
