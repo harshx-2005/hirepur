@@ -25,6 +25,37 @@ transporter.verify((error) => {
 });
 
 const sendEmail = async ({ to, subject, html }) => {
+    // 1. If Resend API Key is configured, use the high-performance HTTP REST API to bypass SMTP network blocks!
+    if (process.env.RESEND_API_KEY) {
+        try {
+            const fromEmail = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+            const response = await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${process.env.RESEND_API_KEY}`
+                },
+                body: JSON.stringify({
+                    from: `HirePur Team <${fromEmail}>`,
+                    to: [to],
+                    subject: subject,
+                    html: html
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Resend HTTP API failure');
+            }
+            console.log(`📧 Resend HTTP API successfully dispatched email to ${to} (ID: ${data.id})`);
+            return data;
+        } catch (error) {
+            console.error('📧 Resend HTTP dispatch error:', error.message);
+            throw new Error('Failed to dispatch verification email via Resend');
+        }
+    }
+
+    // 2. Fallback to standard SMTP (NodeMailer) if Resend is not configured
     try {
         const mailOptions = {
             from: `"HirePur Team" <${process.env.SMTP_USER || process.env.EMAIL_USER}>`,
