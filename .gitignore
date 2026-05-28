@@ -1,0 +1,21 @@
+# Dependency folders
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Environmental configurations
+.env
+backend/.env
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+
+# Debugging logs & OS files
+*.log
+.DS_Store
+.vscode/
+.gemini/
+.idea/
+dist/
+build/
