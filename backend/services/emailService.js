@@ -5,7 +5,8 @@ const transporter = nodemailer.createTransport({
     auth: {
         user: process.env.SMTP_USER || process.env.EMAIL_USER,
         pass: process.env.SMTP_PASS || process.env.EMAIL_PASS
-    }
+    },
+    family: 4 // Forces IPv4 connection to prevent ENETUNREACH IPv6 failures on Render
 });
 
 // Verify SMTP connection on startup

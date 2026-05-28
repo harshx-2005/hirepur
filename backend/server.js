@@ -14,6 +14,7 @@ const path = require('path');
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1); // Trust first proxy (essential for Render/Vercel rate limiters)
 const server = http.createServer(app);
 
 // 1. Security Hardening - Middlewares
