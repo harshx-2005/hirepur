@@ -17,6 +17,92 @@ const StatusBadge = ({ status }) => {
     );
 };
 
+const AdminLoader = () => {
+    const [statusIndex, setStatusIndex] = useState(0);
+    const statuses = [
+        "DECIPHERING ENCRYPTION KEYS...",
+        "ESTABLISHING SECURE HANDSHAKE...",
+        "SYNCHRONIZING SYSTEM LOGS...",
+        "INITIALIZING HIGH-LEVEL ACCESS..."
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setStatusIndex((prev) => (prev < statuses.length - 1 ? prev + 1 : prev));
+        }, 1200);
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center gap-8 text-white relative overflow-hidden">
+            {/* Cybersecurity Tech Grid Background */}
+            <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20" />
+            
+            {/* Glowing cyan blur behind the scanner */}
+            <div className="absolute w-[400px] h-[400px] rounded-full bg-primary/10 blur-[100px] -z-10" />
+
+            <div className="relative flex items-center justify-center w-64 h-64">
+                {/* 1. Rotating Outer Ring (Dashed, clockwise) */}
+                <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+                    className="absolute w-56 h-56 border-2 border-dashed border-primary/40 rounded-full"
+                />
+
+                {/* 2. Rotating Middle Ring (Solid with gap, counter-clockwise) */}
+                <motion.div
+                    animate={{ rotate: -360 }}
+                    transition={{ repeat: Infinity, duration: 5, ease: "linear" }}
+                    className="absolute w-48 h-48 border-2 border-transparent border-t-primary border-b-primary rounded-full opacity-60"
+                />
+
+                {/* 3. Glowing Pulse Inner Ring */}
+                <motion.div
+                    animate={{ scale: [1, 1.08, 1] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                    className="absolute w-36 h-36 border border-primary/30 bg-primary/5 rounded-full flex items-center justify-center shadow-inner shadow-primary/20"
+                />
+
+                {/* 4. Scanning line effect */}
+                <motion.div
+                    animate={{ y: [-70, 70, -70] }}
+                    transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                    className="absolute left-10 right-10 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_8px_#3b82f6] z-10"
+                />
+
+                {/* Center Glowing Shield Check Icon */}
+                <motion.div
+                    animate={{ scale: [0.95, 1.05, 0.95] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                    className="bg-primary/20 p-5 rounded-[2rem] border border-primary/30 shadow-2xl shadow-primary/50 relative z-20 flex items-center justify-center"
+                >
+                    <ShieldCheck className="w-12 h-12 text-primary drop-shadow-[0_0_12px_#3b82f6]" />
+                </motion.div>
+            </div>
+
+            <div className="text-center space-y-3 relative z-10">
+                {/* Glowing status message */}
+                <div className="h-6 flex items-center justify-center">
+                    <h2 className="text-sm font-black uppercase tracking-[0.25em] text-primary drop-shadow-[0_0_8px_#3b82f6] animate-pulse">
+                        {statuses[statusIndex]}
+                    </h2>
+                </div>
+                
+                {/* Cybersecurity cryptographic session details */}
+                <div className="flex flex-col items-center gap-1">
+                    <p className="text-slate-500 font-bold text-[9px] uppercase tracking-widest flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                        SECURE HANDSHAKE HP-ADM-SECURE-882...
+                    </p>
+                    <p className="text-slate-600 font-medium text-[8px] uppercase tracking-wider">
+                        ENCRYPTION: AES-256-GCM | KEY-AUTH: VERIFIED
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const AdminDashboard = () => {
     const [stats, setStats] = useState(null);
     const [users, setUsers] = useState([]);
@@ -98,21 +184,7 @@ const AdminDashboard = () => {
     };
 
     if (isLoading) {
-        return (
-            <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center gap-6 text-white">
-                <motion.div 
-                    animate={{ rotate: 360 }} 
-                    transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
-                    className="bg-primary/20 p-6 rounded-[2rem] border border-primary/20 shadow-2xl shadow-primary/20"
-                >
-                    <ShieldCheck className="w-12 h-12 text-primary" />
-                </motion.div>
-                <div className="text-center space-y-2">
-                    <h2 className="text-sm font-black uppercase tracking-[0.25em] text-primary animate-pulse">Initialising High-Level Access...</h2>
-                    <p className="text-slate-500 font-bold text-[9px] uppercase tracking-widest">SECURE HANDSHAKE HP-ADM-SECURE-882...</p>
-                </div>
-            </div>
-        );
+        return <AdminLoader />;
     }
 
     if (error) {

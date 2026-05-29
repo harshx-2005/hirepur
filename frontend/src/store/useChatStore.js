@@ -279,5 +279,10 @@ export const useChatStore = create((set, get) => ({
             socket.disconnect();
             set({ socket: null, activePartner: null, activeConversationId: null, messages: [], activePartnerError: null });
         }
+    },
+
+    // 7. Clear active chat state without disconnecting global socket
+    clearActiveChat: () => {
+        set({ activePartner: null, activeConversationId: null, messages: [], activePartnerError: null });
     }
 }));

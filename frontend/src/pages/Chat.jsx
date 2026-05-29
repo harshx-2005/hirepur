@@ -26,7 +26,7 @@ const Chat = () => {
         initSocket,
         sendMessage,
         sendTyping,
-        disconnectSocket
+        clearActiveChat
     } = useChatStore();
 
     const [input, setInput] = useState('');
@@ -42,8 +42,8 @@ const Chat = () => {
             initSocket(token);
             fetchConversations();
         }
-        return () => disconnectSocket();
-    }, [token, initSocket, fetchConversations, disconnectSocket]);
+        return () => clearActiveChat();
+    }, [token, initSocket, fetchConversations, clearActiveChat]);
 
     // 2. Select initial chat partner if passed via URL parameter
     useEffect(() => {

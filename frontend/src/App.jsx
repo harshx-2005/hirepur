@@ -24,6 +24,7 @@ import LegalPrivacy from './pages/LegalPrivacy';
 import TermsOfService from './pages/TermsOfService';
 import ResumeAnalyzer from './pages/ResumeAnalyzer';
 import { useAuthStore } from './store/useAuthStore';
+import { useChatStore } from './store/useChatStore';
 
 // New Authentication Workflow Pages
 import VerifyOtp from './pages/VerifyOtp';
@@ -37,11 +38,20 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 
 const App = () => {
-  const { checkAuth, isCheckingAuth, user } = useAuthStore();
+  const { checkAuth, isCheckingAuth, token, user } = useAuthStore();
+  const { initSocket, disconnectSocket } = useChatStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (token) {
+      initSocket(token);
+    } else {
+      disconnectSocket();
+    }
+  }, [token, initSocket, disconnectSocket]);
 
   if (isCheckingAuth) {
       return (

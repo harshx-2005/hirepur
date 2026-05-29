@@ -180,6 +180,42 @@ exports.batchUpdateApplicationStatus = async (req, res) => {
 
         await pool.query('UPDATE APPLICATIONS SET status = ? WHERE id IN (?)', [status, ids]);
 
+        // Real-time Notification: Notify the Candidates
+        try {
+            const formattedStatus = status.replace('_', ' ').toUpperCase();
+            // Fetch candidate and job details for notifications
+            const [detailsRows] = await pool.query(`
+                SELECT a.id as application_id, a.user_id, j.title 
+                FROM APPLICATIONS a 
+                JOIN JOBS j ON a.job_id = j.id 
+                WHERE a.id IN (?)
+            `, [ids]);
+
+            for (const detail of detailsRows) {
+                const message = `Your application for ${detail.title} has been updated to: ${formattedStatus}`;
+                const [notifResult] = await pool.query(
+                    `INSERT INTO NOTIFICATIONS (user_id, message, type, related_id) 
+                     VALUES (?, ?, 'status_change', ?)`,
+                    [detail.user_id, message, detail.application_id]
+                );
+
+                const notifObj = {
+                    id: notifResult.insertId,
+                    message,
+                    type: 'status_change',
+                    related_id: detail.application_id,
+                    is_read: 0,
+                    created_at: new Date()
+                };
+
+                if (req.io) {
+                    req.io.to(`user_${detail.user_id}`).emit('receive_notification', notifObj);
+                }
+            }
+        } catch (notifErr) {
+            console.error('⚠️ Batch Status Notification Dispatch Error:', notifErr.message);
+        }
+
         // Send emails in background
         const [userRows] = await pool.query(`
             SELECT u.name, u.email, j.title 
