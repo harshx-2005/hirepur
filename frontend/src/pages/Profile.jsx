@@ -296,7 +296,7 @@ const Profile = () => {
 
 
                     <div className="lg:col-span-2 space-y-6">
-                        {user?.role === 'employer' ? (
+                        {displayRole === 'employer' ? (
                             <div className="glass-card space-y-8">
                                 <h3 className="text-xl font-bold flex items-center gap-2 italic">
                                     🏢 Company Information
