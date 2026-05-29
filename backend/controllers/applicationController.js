@@ -28,7 +28,7 @@ exports.applyForJob = async (req, res) => {
         try {
             const message = `${req.user.name} applied for your job: ${job.title}`;
             const [notifResult] = await pool.query(
-                `INSERT INTO NOTIFICATIONS (user_id, message, type, related_id) 
+                `INSERT INTO notifications (user_id, message, type, related_id) 
                  VALUES (?, ?, 'application', ?)`,
                 [job.employer_user_id, message, job.id]
             );
@@ -101,7 +101,7 @@ exports.updateApplicationStatus = async (req, res) => {
         if (!job) return res.status(404).json({ success: false, message: 'Job not found for this application' });
 
         // Verify employer owns job
-        const [employerRows] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [employerRows] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [req.user.id]);
         if (employerRows.length === 0 || job.employer_id !== employerRows[0].id) {
             return res.status(403).json({ success: false, message: 'Not authorized to update this application' });
         }
@@ -114,7 +114,7 @@ exports.updateApplicationStatus = async (req, res) => {
             const formattedStatus = status.replace('_', ' ').toUpperCase();
             const message = `Your application for ${job.title} has been updated to: ${formattedStatus}`;
             const [notifResult] = await pool.query(
-                `INSERT INTO NOTIFICATIONS (user_id, message, type, related_id) 
+                `INSERT INTO notifications (user_id, message, type, related_id) 
                  VALUES (?, ?, 'status_change', ?)`,
                 [application.user_id, message, application.id]
             );
@@ -136,7 +136,7 @@ exports.updateApplicationStatus = async (req, res) => {
         }
 
         // Fetch applicant details for email
-        const [userRows] = await pool.query('SELECT name, email FROM USERS WHERE id = ?', [application.user_id]);
+        const [userRows] = await pool.query('SELECT name, email FROM users WHERE id = ?', [application.user_id]);
         if (userRows.length > 0) {
             const applicant = userRows[0];
             // Fire and forget email notification to avoid blocking response
@@ -160,7 +160,7 @@ exports.batchUpdateApplicationStatus = async (req, res) => {
         }
 
         // Verify employer owns the jobs for all applications
-        const [employerRows] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [employerRows] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [req.user.id]);
         if (employerRows.length === 0) {
             return res.status(403).json({ success: false, message: 'Not authorized' });
         }
@@ -169,8 +169,8 @@ exports.batchUpdateApplicationStatus = async (req, res) => {
         // Fetch applications and their job owners
         const [rows] = await pool.query(`
             SELECT a.id, j.employer_id 
-            FROM APPLICATIONS a 
-            JOIN JOBS j ON a.job_id = j.id 
+            FROM applications a 
+            JOIN jobs j ON a.job_id = j.id 
             WHERE a.id IN (?)
         `, [ids]);
 
@@ -179,7 +179,7 @@ exports.batchUpdateApplicationStatus = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Not authorized for some applications or IDs invalid' });
         }
 
-        await pool.query('UPDATE APPLICATIONS SET status = ? WHERE id IN (?)', [status, ids]);
+        await pool.query('UPDATE applications SET status = ? WHERE id IN (?)', [status, ids]);
 
         // Real-time Notification: Notify the Candidates
         try {
@@ -187,15 +187,15 @@ exports.batchUpdateApplicationStatus = async (req, res) => {
             // Fetch candidate and job details for notifications
             const [detailsRows] = await pool.query(`
                 SELECT a.id as application_id, a.user_id, j.title 
-                FROM APPLICATIONS a 
-                JOIN JOBS j ON a.job_id = j.id 
+                FROM applications a 
+                JOIN jobs j ON a.job_id = j.id 
                 WHERE a.id IN (?)
             `, [ids]);
 
             for (const detail of detailsRows) {
                 const message = `Your application for ${detail.title} has been updated to: ${formattedStatus}`;
                 const [notifResult] = await pool.query(
-                    `INSERT INTO NOTIFICATIONS (user_id, message, type, related_id) 
+                    `INSERT INTO notifications (user_id, message, type, related_id) 
                      VALUES (?, ?, 'status_change', ?)`,
                     [detail.user_id, message, detail.application_id]
                 );
@@ -220,9 +220,9 @@ exports.batchUpdateApplicationStatus = async (req, res) => {
         // Send emails in background
         const [userRows] = await pool.query(`
             SELECT u.name, u.email, j.title 
-            FROM APPLICATIONS a 
-            JOIN USERS u ON a.user_id = u.id 
-            JOIN JOBS j ON a.job_id = j.id 
+            FROM applications a 
+            JOIN users u ON a.user_id = u.id 
+            JOIN jobs j ON a.job_id = j.id 
             WHERE a.id IN (?)
         `, [ids]);
 

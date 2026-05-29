@@ -105,7 +105,27 @@ exports.getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
         if (!user) return res.status(404).json({ success: false, message: 'User not found' });
-        res.status(200).json({ success: true, data: { id: user.id, name: user.name, profile_pic: user.profile_pic } });
+
+        let profileData = {};
+        if (user.role === 'job_seeker') {
+            const [rows] = await pool.query('SELECT * FROM JOB_SEEKER_PROFILE WHERE user_id = ?', [user.id]);
+            profileData = rows.length ? rows[0] : {};
+        } else if (user.role === 'employer') {
+            const [rows] = await pool.query('SELECT * FROM EMPLOYER_PROFILE WHERE user_id = ?', [user.id]);
+            profileData = rows.length ? rows[0] : {};
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            data: { 
+                id: user.id, 
+                name: user.name, 
+                email: user.email, 
+                role: user.role, 
+                profile_pic: user.profile_pic,
+                profile: profileData
+            } 
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Server error' });

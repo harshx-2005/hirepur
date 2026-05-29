@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -142,7 +143,11 @@ const ApplicationReview = () => {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-3 mb-1">
-                                            <h3 className="text-xl font-black text-slate-900">{app.applicant_name}</h3>
+                                            <h3 className="text-xl font-black text-slate-900 hover:text-primary hover:underline transition-all">
+                                                <Link to={`/profile?userId=${app.user_id}`}>
+                                                    {app.applicant_name}
+                                                </Link>
+                                            </h3>
                                             <div className="relative inline-block">
                                                 <select
                                                     value={app.status}

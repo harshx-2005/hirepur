@@ -78,21 +78,21 @@ async function migrate() {
             console.log('✔️ is_verified column already exists in USERS.');
         }
 
-        // 6. Add type and related_id to NOTIFICATIONS safely
-        const [notifTypeCol] = await pool.query("SHOW COLUMNS FROM NOTIFICATIONS LIKE 'type'");
+        // 6. Add type and related_id to notifications safely
+        const [notifTypeCol] = await pool.query("SHOW COLUMNS FROM notifications LIKE 'type'");
         if (notifTypeCol.length === 0) {
-            await pool.query("ALTER TABLE NOTIFICATIONS ADD COLUMN type VARCHAR(50) DEFAULT 'general'");
-            console.log('✔️ Added type column to NOTIFICATIONS.');
+            await pool.query("ALTER TABLE notifications ADD COLUMN type VARCHAR(50) DEFAULT 'general'");
+            console.log('✔️ Added type column to notifications.');
         } else {
-            console.log('✔️ type column already exists in NOTIFICATIONS.');
+            console.log('✔️ type column already exists in notifications.');
         }
 
-        const [notifRelatedCol] = await pool.query("SHOW COLUMNS FROM NOTIFICATIONS LIKE 'related_id'");
+        const [notifRelatedCol] = await pool.query("SHOW COLUMNS FROM notifications LIKE 'related_id'");
         if (notifRelatedCol.length === 0) {
-            await pool.query("ALTER TABLE NOTIFICATIONS ADD COLUMN related_id INT DEFAULT NULL");
-            console.log('✔️ Added related_id column to NOTIFICATIONS.');
+            await pool.query("ALTER TABLE notifications ADD COLUMN related_id INT DEFAULT NULL");
+            console.log('✔️ Added related_id column to notifications.');
         } else {
-            console.log('✔️ related_id column already exists in NOTIFICATIONS.');
+            console.log('✔️ related_id column already exists in notifications.');
         }
 
         // 7. Set existing users to active/verified so they don't get locked out

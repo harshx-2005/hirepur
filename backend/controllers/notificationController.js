@@ -5,7 +5,7 @@ exports.getNotifications = async (req, res, next) => {
     try {
         const [rows] = await pool.query(
             `SELECT id, message, is_read, type, related_id, created_at 
-             FROM NOTIFICATIONS 
+             FROM notifications 
              WHERE user_id = ? 
              ORDER BY created_at DESC 
              LIMIT 50`,
@@ -14,7 +14,7 @@ exports.getNotifications = async (req, res, next) => {
 
         const [countRow] = await pool.query(
             `SELECT COUNT(*) as unread_count 
-             FROM NOTIFICATIONS 
+             FROM notifications 
              WHERE user_id = ? AND is_read = 0`,
             [req.user.id]
         );
@@ -35,7 +35,7 @@ exports.markAsRead = async (req, res, next) => {
     try {
         const notificationId = req.params.id;
         await pool.query(
-            'UPDATE NOTIFICATIONS SET is_read = 1 WHERE id = ? AND user_id = ?',
+            'UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?',
             [notificationId, req.user.id]
         );
 
@@ -50,7 +50,7 @@ exports.markAsRead = async (req, res, next) => {
 exports.markAllAsRead = async (req, res, next) => {
     try {
         await pool.query(
-            'UPDATE NOTIFICATIONS SET is_read = 1 WHERE user_id = ?',
+            'UPDATE notifications SET is_read = 1 WHERE user_id = ?',
             [req.user.id]
         );
 

@@ -130,9 +130,9 @@ const Chat = {
         // Rule B: Employer messaging a Candidate who applied to their jobs
         if (myUser.role === 'employer' && partnerUser.role === 'job_seeker') {
             const [app] = await pool.query(
-                `SELECT a.id FROM APPLICATIONS a
-                 JOIN JOBS j ON j.id = a.job_id
-                 JOIN EMPLOYER_PROFILE ep ON ep.id = j.employer_id
+                `SELECT a.id FROM applications a
+                 JOIN jobs j ON j.id = a.job_id
+                 JOIN employer_profile ep ON ep.id = j.employer_id
                  WHERE ep.user_id = ? AND a.user_id = ?
                  LIMIT 1`,
                 [userId, partnerId]
@@ -143,9 +143,9 @@ const Chat = {
         // Rule C: Job Seeker messaging an Employer of a job they applied to
         if (myUser.role === 'job_seeker' && partnerUser.role === 'employer') {
             const [app] = await pool.query(
-                `SELECT a.id FROM APPLICATIONS a
-                 JOIN JOBS j ON j.id = a.job_id
-                 JOIN EMPLOYER_PROFILE ep ON ep.id = j.employer_id
+                `SELECT a.id FROM applications a
+                 JOIN jobs j ON j.id = a.job_id
+                 JOIN employer_profile ep ON ep.id = j.employer_id
                  WHERE a.user_id = ? AND ep.user_id = ?
                  LIMIT 1`,
                 [userId, partnerId]

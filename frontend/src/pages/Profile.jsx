@@ -3,12 +3,17 @@ import { motion } from 'framer-motion';
 import { useProfileStore } from '../store/useProfileStore';
 import { User, Mail, MapPin, Linkedin, Globe, Save, RefreshCw, Briefcase, GraduationCap, Plus, Trash2, Zap, Camera } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
+import { useSearchParams } from 'react-router-dom';
 import apiClient from '../api/client';
 
 const Profile = () => {
     const { user, setUser } = useAuthStore();
     const { profile, fetchProfile, updateProfile, isLoading, updateProfilePic } = useProfileStore();
     const [isUploading, setIsUploading] = useState(false);
+    const [searchParams] = useSearchParams();
+    const queryUserId = searchParams.get('userId');
+    const isReadOnly = !!queryUserId;
+    const [viewUser, setViewUser] = useState(null);
     
     const [formData, setFormData] = useState({
         phone: '',
@@ -32,11 +37,49 @@ const Profile = () => {
     const [isFresher, setIsFresher] = useState(false);
 
     useEffect(() => {
-        fetchProfile();
-    }, [fetchProfile]);
+        if (isReadOnly) {
+            const fetchTargetProfile = async () => {
+                try {
+                    const res = await apiClient.get(`/profile/${queryUserId}`);
+                    if (res.data.success) {
+                        const targetData = res.data.data;
+                        setViewUser({
+                            name: targetData.name,
+                            email: targetData.email,
+                            role: targetData.role,
+                            profile_pic: targetData.profile_pic
+                        });
+                        const targetProfile = targetData.profile || {};
+                        setFormData({
+                            phone: targetProfile.phone || '',
+                            headline: targetProfile.headline || '',
+                            summary: targetProfile.summary || '',
+                            location: targetProfile.location || '',
+                            linkedin: targetProfile.linkedin || '',
+                            portfolio: targetProfile.portfolio || '',
+                            skills: typeof targetProfile.skills === 'string' ? JSON.parse(targetProfile.skills) : (targetProfile.skills || []),
+                            experience: typeof targetProfile.experience === 'string' ? JSON.parse(targetProfile.experience) : (targetProfile.experience || []),
+                            education: typeof targetProfile.education === 'string' ? JSON.parse(targetProfile.education) : (targetProfile.education || []),
+                            projects: typeof targetProfile.projects === 'string' ? JSON.parse(targetProfile.projects) : (targetProfile.projects || []),
+                            company_name: targetProfile.company_name || '',
+                            company_website: targetProfile.company_website || '',
+                            company_size: targetProfile.company_size || '',
+                            industry: targetProfile.industry || '',
+                            company_description: targetProfile.company_description || ''
+                        });
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch target user profile:', err);
+                }
+            };
+            fetchTargetProfile();
+        } else {
+            fetchProfile();
+        }
+    }, [fetchProfile, isReadOnly, queryUserId]);
 
     useEffect(() => {
-        if (profile) {
+        if (!isReadOnly && profile) {
             setFormData({
                 phone: profile.phone || '',
                 headline: profile.headline || '',
@@ -55,13 +98,15 @@ const Profile = () => {
                 company_description: profile.company_description || ''
             });
         }
-    }, [profile]);
+    }, [profile, isReadOnly]);
 
     const handleSave = async () => {
+        if (isReadOnly) return;
         await updateProfile(formData);
     };
 
     const handlePhotoUpload = async (e) => {
+        if (isReadOnly) return;
         const file = e.target.files[0];
         if (!file) return;
 
@@ -107,6 +152,11 @@ const Profile = () => {
         setFormData(prev => ({ ...prev, [field]: newList }));
     };
 
+    const displayName = isReadOnly ? viewUser?.name : user?.name;
+    const displayEmail = isReadOnly ? viewUser?.email : user?.email;
+    const displayRole = isReadOnly ? viewUser?.role : user?.role;
+    const displayPic = isReadOnly ? viewUser?.profile_pic : user?.profile_pic;
+
     return (
         <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto space-y-8">
@@ -118,30 +168,32 @@ const Profile = () => {
                     <div className="relative group">
                         <div className="w-32 h-32 rounded-[2.5rem] bg-gradient-to-tr from-primary to-secondary p-1 overflow-hidden">
                             <div className="w-full h-full rounded-[2.3rem] bg-white flex items-center justify-center overflow-hidden">
-                                {user?.profile_pic ? (
-                                    <img src={user.profile_pic} alt="Profile" className="w-full h-full object-cover" />
+                                {displayPic ? (
+                                    <img src={displayPic} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
                                     <User className="w-16 h-16 text-primary" />
                                 )}
                             </div>
                         </div>
-                        <label className="absolute -bottom-2 -right-2 bg-primary w-10 h-10 rounded-full border-4 border-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg">
-                            <input type="file" className="hidden" onChange={handlePhotoUpload} accept="image/*" />
-                            {isUploading ? <RefreshCw className="w-4 h-4 text-white animate-spin" /> : <Camera className="w-4 h-4 text-white" />}
-                        </label>
+                        {!isReadOnly && (
+                            <label className="absolute -bottom-2 -right-2 bg-primary w-10 h-10 rounded-full border-4 border-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg">
+                                <input type="file" className="hidden" onChange={handlePhotoUpload} accept="image/*" />
+                                {isUploading ? <RefreshCw className="w-4 h-4 text-white animate-spin" /> : <Camera className="w-4 h-4 text-white" />}
+                            </label>
+                        )}
                     </div>
 
                     <div className="flex-grow text-center md:text-left">
-                        <h1 className="text-3xl font-black text-gray-900">{user?.name}</h1>
+                        <h1 className="text-3xl font-black text-gray-900">{displayName}</h1>
                         <p className="text-gray-500 font-medium flex items-center justify-center md:justify-start gap-2 mt-1">
-                            <Mail className="w-4 h-4"/> {user?.email}
+                            <Mail className="w-4 h-4"/> {displayEmail}
                         </p>
                         <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-4">
                             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-400 bg-gray-50 px-3 py-1 rounded-lg border border-gray-100">
                                 <MapPin className="w-3 h-3"/> {formData.location || 'Location Not Set'}
                             </div>
                             <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-primary bg-primary/5 px-3 py-1 rounded-lg border border-primary/10">
-                                <Briefcase className="w-3 h-3"/> {user?.role === 'employer' ? formData.company_name : user?.role?.replace('_', ' ')}
+                                <Briefcase className="w-3 h-3"/> {displayRole === 'employer' ? formData.company_name : displayRole?.replace('_', ' ')}
                             </div>
                         </div>
                     </div>
@@ -558,16 +610,18 @@ const Profile = () => {
                 </div>
 
                 {/* Final Save Button */}
-                <div className="flex justify-center pt-8 pb-12">
-                    <button 
-                        onClick={handleSave}
-                        disabled={isLoading}
-                        className="btn-primary px-12 py-4 flex items-center gap-3 shadow-2xl shadow-primary/30 disabled:opacity-50 text-lg"
-                    >
-                        {isLoading ? <RefreshCw className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
-                        Save Professional Profile
-                    </button>
-                </div>
+                {!isReadOnly && (
+                    <div className="flex justify-center pt-8 pb-12">
+                        <button 
+                            onClick={handleSave}
+                            disabled={isLoading}
+                            className="btn-primary px-12 py-4 flex items-center gap-3 shadow-2xl shadow-primary/30 disabled:opacity-50 text-lg"
+                        >
+                            {isLoading ? <RefreshCw className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
+                            Save Professional Profile
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
