@@ -56,7 +56,7 @@ exports.analyzeResume = async (req, res) => {
 
     
         if (!finalResume) {
-            const [profileRows] = await pool.query('SELECT headline, summary, skills, experience, education, projects FROM JOB_SEEKER_PROFILE WHERE user_id = ?', [req.user.id]);
+            const [profileRows] = await pool.query('SELECT headline, summary, skills, experience, education, projects FROM job_seeker_profile WHERE user_id = ?', [req.user.id]);
             if (profileRows.length > 0) {
                 const p = profileRows[0];
                 
@@ -150,7 +150,7 @@ exports.jobMatch = async (req, res) => {
         // Feature 5: AI Job Matching
         if (req.user.role !== 'job_seeker') return res.status(403).json({ success: false, message: 'Access denied' });
 
-        const [profileRows] = await pool.query('SELECT skills, experience, headline FROM JOB_SEEKER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [profileRows] = await pool.query('SELECT skills, experience, headline FROM job_seeker_profile WHERE user_id = ?', [req.user.id]);
         if (profileRows.length === 0) return res.status(404).json({ success: false, message: 'Profile not found' });
         
         const userProfile = profileRows[0];

@@ -22,14 +22,14 @@ async function connectDB() {
 
     // Self-healing: Automatically check and seed default administrator user if missing
     try {
-      const [rows] = await pool.query("SELECT id FROM USERS WHERE email = 'admin@gmail.com' LIMIT 1");
+      const [rows] = await pool.query("SELECT id FROM users WHERE email = 'admin@gmail.com' LIMIT 1");
       if (rows.length === 0) {
         console.log("🌱 Default admin user missing. Seeding System Admin...");
         const bcrypt = require('bcryptjs');
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash('admin123', salt);
         await pool.query(
-          "INSERT INTO USERS (name, email, password, role, is_verified) VALUES ('System Admin', 'admin@gmail.com', ?, 'admin', 1)",
+          "INSERT INTO users (name, email, password, role, is_verified) VALUES ('System Admin', 'admin@gmail.com', ?, 'admin', 1)",
           [hashedPassword]
         );
         console.log("🌱 System Admin successfully seeded in database!");

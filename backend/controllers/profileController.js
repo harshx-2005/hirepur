@@ -6,16 +6,16 @@ exports.getProfile = async (req, res) => {
         // Allow any authenticated user to check their profile, 
         // but only return JOB_SEEKER_PROFILE data if they are a job seeker.
         if (req.user.role === 'job_seeker') {
-            const [rows] = await pool.query('SELECT * FROM JOB_SEEKER_PROFILE WHERE user_id = ?', [req.user.id]);
+            const [rows] = await pool.query('SELECT * FROM job_seeker_profile WHERE user_id = ?', [req.user.id]);
             
             if (rows.length === 0) {
-                await pool.query('INSERT INTO JOB_SEEKER_PROFILE (user_id) VALUES (?)', [req.user.id]);
-                const [newRows] = await pool.query('SELECT * FROM JOB_SEEKER_PROFILE WHERE user_id = ?', [req.user.id]);
+                await pool.query('INSERT INTO job_seeker_profile (user_id) VALUES (?)', [req.user.id]);
+                const [newRows] = await pool.query('SELECT * FROM job_seeker_profile WHERE user_id = ?', [req.user.id]);
                 return res.status(200).json({ success: true, data: newRows[0] });
             }
             return res.status(200).json({ success: true, data: rows[0] });
         } else if (req.user.role === 'employer') {
-            const [rows] = await pool.query('SELECT * FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+            const [rows] = await pool.query('SELECT * FROM employer_profile WHERE user_id = ?', [req.user.id]);
             if (rows.length === 0) {
                 // This shouldn't happen if registration is correct, but safe fallback
                 return res.status(200).json({ success: true, data: { company_name: req.user.name } });
@@ -35,7 +35,7 @@ exports.updateProfile = async (req, res) => {
         if (req.user.role === 'job_seeker') {
             const { phone, headline, summary, skills, experience, education, projects, location, linkedin, portfolio } = req.body;
             await pool.query(
-                `UPDATE JOB_SEEKER_PROFILE SET 
+                `UPDATE job_seeker_profile SET 
                 phone = ?,
                 headline = ?, 
                 summary = ?,
@@ -64,7 +64,7 @@ exports.updateProfile = async (req, res) => {
         } else if (req.user.role === 'employer') {
             const { company_name, company_website, company_size, industry, company_description, location } = req.body;
             await pool.query(
-                `UPDATE EMPLOYER_PROFILE SET 
+                `UPDATE employer_profile SET 
                 company_name = ?,
                 company_website = ?,
                 company_size = ?,
@@ -92,7 +92,7 @@ exports.updateProfilePic = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Profile picture URL is required' });
         }
 
-        await pool.query('UPDATE USERS SET profile_pic = ? WHERE id = ?', [profile_pic, req.user.id]);
+        await pool.query('UPDATE users SET profile_pic = ? WHERE id = ?', [profile_pic, req.user.id]);
 
         res.status(200).json({ success: true, message: 'Profile picture updated', profile_pic });
     } catch (error) {
@@ -108,10 +108,10 @@ exports.getUserById = async (req, res) => {
 
         let profileData = {};
         if (user.role === 'job_seeker') {
-            const [rows] = await pool.query('SELECT * FROM JOB_SEEKER_PROFILE WHERE user_id = ?', [user.id]);
+            const [rows] = await pool.query('SELECT * FROM job_seeker_profile WHERE user_id = ?', [user.id]);
             profileData = rows.length ? rows[0] : {};
         } else if (user.role === 'employer') {
-            const [rows] = await pool.query('SELECT * FROM EMPLOYER_PROFILE WHERE user_id = ?', [user.id]);
+            const [rows] = await pool.query('SELECT * FROM employer_profile WHERE user_id = ?', [user.id]);
             profileData = rows.length ? rows[0] : {};
         }
 

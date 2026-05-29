@@ -76,7 +76,7 @@ exports.getJobApplications = async (req, res) => {
         if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
 
         // Verify employer owns job
-        const [employerRows] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [employerRows] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [req.user.id]);
         if (employerRows.length === 0 || job.employer_id !== employerRows[0].id) {
             return res.status(403).json({ success: false, message: 'Not authorized to view these applications' });
         }

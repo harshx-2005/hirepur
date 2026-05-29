@@ -3,10 +3,10 @@ const { pool } = require('../config/db');
 exports.getStats = async (req, res) => {
     try {
         console.log('Fetching admin stats...');
-        const [userCount] = await pool.query('SELECT COUNT(*) as total FROM USERS');
-        const [jobCount] = await pool.query('SELECT COUNT(*) as total FROM JOBS');
-        const [applicationCount] = await pool.query('SELECT COUNT(*) as total FROM APPLICATIONS');
-        const [employerCount] = await pool.query('SELECT COUNT(*) as total FROM USERS WHERE role = "employer"');
+        const [userCount] = await pool.query('SELECT COUNT(*) as total FROM users');
+        const [jobCount] = await pool.query('SELECT COUNT(*) as total FROM jobs');
+        const [applicationCount] = await pool.query('SELECT COUNT(*) as total FROM applications');
+        const [employerCount] = await pool.query('SELECT COUNT(*) as total FROM users WHERE role = "employer"');
 
         const stats = {
             users: userCount[0].total,
@@ -29,7 +29,7 @@ exports.getStats = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
     try {
         const { search } = req.query;
-        let query = 'SELECT id, name, email, role, created_at FROM USERS';
+        let query = 'SELECT id, name, email, role, created_at FROM users';
         let params = [];
 
         if (search) {
@@ -53,7 +53,7 @@ exports.deleteUser = async (req, res) => {
         if (id == req.user.id) {
             return res.status(400).json({ success: false, message: 'Admins cannot delete their own account.' });
         }
-        await pool.query('DELETE FROM USERS WHERE id = ?', [id]);
+        await pool.query('DELETE FROM users WHERE id = ?', [id]);
         res.status(200).json({ success: true, message: 'User deleted successfully' });
     } catch (error) {
         console.error('Delete User Error:', error);
@@ -66,8 +66,8 @@ exports.getAllJobs = async (req, res) => {
         const { search } = req.query;
         let query = `
             SELECT j.*, e.company_name 
-            FROM JOBS j 
-            LEFT JOIN EMPLOYER_PROFILE e ON j.employer_id = e.id
+            FROM jobs j 
+            LEFT JOIN employer_profile e ON j.employer_id = e.id
         `;
         let params = [];
 
@@ -89,7 +89,7 @@ exports.getAllJobs = async (req, res) => {
 exports.deleteJob = async (req, res) => {
     try {
         const { id } = req.params;
-        await pool.query('DELETE FROM JOBS WHERE id = ?', [id]);
+        await pool.query('DELETE FROM jobs WHERE id = ?', [id]);
         res.status(200).json({ success: true, message: 'Job deleted successfully' });
     } catch (error) {
         console.error('Delete Job Error:', error);
@@ -110,7 +110,7 @@ exports.updateUserRole = async (req, res) => {
             return res.status(400).json({ success: false, message: 'You cannot change your own role.' });
         }
 
-        await pool.query('UPDATE USERS SET role = ? WHERE id = ?', [role, id]);
+        await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, id]);
         res.status(200).json({ success: true, message: 'User role updated successfully' });
     } catch (error) {
         console.error('Update Role Error:', error);

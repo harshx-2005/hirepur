@@ -94,7 +94,7 @@ const Chat = {
                     WHERE m.conversation_id = c.id AND m.sender_id = u.id AND m.is_read = 0
                 ) AS unread_count
              FROM conversations c
-             JOIN USERS u ON (u.id = c.user1_id AND c.user2_id = ?) OR (u.id = c.user2_id AND c.user1_id = ?)
+             JOIN users u ON (u.id = c.user1_id AND c.user2_id = ?) OR (u.id = c.user2_id AND c.user1_id = ?)
              ORDER BY c.updated_at DESC`,
             [userId, userId]
         );
@@ -113,7 +113,7 @@ const Chat = {
     // 6. Security Check: Can these two users communicate?
     canChat: async (userId, partnerId) => {
         // Retrieve roles
-        const [users] = await pool.query('SELECT id, role FROM USERS WHERE id IN (?, ?)', [userId, partnerId]);
+        const [users] = await pool.query('SELECT id, role FROM users WHERE id IN (?, ?)', [userId, partnerId]);
         if (users.length < 2) return false;
 
         const myUser = users.find(u => u.id == userId);

@@ -47,7 +47,7 @@ exports.getJob = async (req, res) => {
 exports.createJob = async (req, res) => {
     try {
         // Fetch employer ID based on authenticated user
-        const [employerRows] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [employerRows] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [req.user.id]);
         if (employerRows.length === 0) {
             return res.status(403).json({ success: false, message: 'Only employers can post jobs' });
         }
@@ -69,7 +69,7 @@ exports.updateJob = async (req, res) => {
         const job = await Job.findById(jobId);
         if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
 
-        const [employerRows] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [employerRows] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [req.user.id]);
         if (employerRows.length === 0 || job.employer_id !== employerRows[0].id) {
             return res.status(403).json({ success: false, message: 'Not authorized to update this job' });
         }
@@ -89,7 +89,7 @@ exports.deleteJob = async (req, res) => {
         const job = await Job.findById(jobId);
         if (!job) return res.status(404).json({ success: false, message: 'Job not found' });
 
-        const [employerRows] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [employerRows] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [req.user.id]);
         if (employerRows.length === 0 || job.employer_id !== employerRows[0].id) {
             return res.status(403).json({ success: false, message: 'Not authorized to delete this job' });
         }

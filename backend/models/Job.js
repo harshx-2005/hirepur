@@ -2,7 +2,7 @@ const { pool } = require('../config/db');
 
 const Job = {
     findAll: async (filters = {}, page = 1, limit = 10) => {
-        let query = 'SELECT j.*, e.company_name, e.company_logo FROM JOBS j JOIN EMPLOYER_PROFILE e ON j.employer_id = e.id WHERE 1=1';
+        let query = 'SELECT j.*, e.company_name, e.company_logo FROM jobs j JOIN employer_profile e ON j.employer_id = e.id WHERE 1=1';
         const queryParams = [];
 
         if (filters.title) {
@@ -30,7 +30,7 @@ const Job = {
     },
 
     countAll: async (filters = {}) => {
-        let query = 'SELECT COUNT(*) as total FROM JOBS j JOIN EMPLOYER_PROFILE e ON j.employer_id = e.id WHERE 1=1';
+        let query = 'SELECT COUNT(*) as total FROM jobs j JOIN employer_profile e ON j.employer_id = e.id WHERE 1=1';
         const queryParams = [];
 
         if (filters.title) {
@@ -52,7 +52,7 @@ const Job = {
 
     findById: async (id) => {
         const [rows] = await pool.query(
-            'SELECT j.*, e.company_name, e.company_logo, e.company_website, e.industry, e.user_id as employer_user_id FROM JOBS j JOIN EMPLOYER_PROFILE e ON j.employer_id = e.id WHERE j.id = ?',
+            'SELECT j.*, e.company_name, e.company_logo, e.company_website, e.industry, e.user_id as employer_user_id FROM jobs j JOIN employer_profile e ON j.employer_id = e.id WHERE j.id = ?',
             [id]
         );
         return rows.length ? rows[0] : null;
@@ -65,7 +65,7 @@ const Job = {
         const skillsJson = JSON.stringify(skills_required || []);
 
         const [result] = await pool.query(
-            'INSERT INTO JOBS (employer_id, title, description, salary_range, experience_required, job_type, work_mode, location, skills_required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO jobs (employer_id, title, description, salary_range, experience_required, job_type, work_mode, location, skills_required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [employerId, title, description, salary_range, experience_required, job_type, work_mode, location, skillsJson]
         );
         return result.insertId;
@@ -77,14 +77,14 @@ const Job = {
         const skillsJson = skills_required ? JSON.stringify(skills_required) : undefined;
         
         const [result] = await pool.query(
-            'UPDATE JOBS SET title = COALESCE(?, title), description = COALESCE(?, description), salary_range = COALESCE(?, salary_range), experience_required = COALESCE(?, experience_required), job_type = COALESCE(?, job_type), work_mode = COALESCE(?, work_mode), location = COALESCE(?, location), skills_required = COALESCE(?, skills_required) WHERE id = ?',
+            'UPDATE jobs SET title = COALESCE(?, title), description = COALESCE(?, description), salary_range = COALESCE(?, salary_range), experience_required = COALESCE(?, experience_required), job_type = COALESCE(?, job_type), work_mode = COALESCE(?, work_mode), location = COALESCE(?, location), skills_required = COALESCE(?, skills_required) WHERE id = ?',
             [title, description, salary_range, experience_required, job_type, work_mode, location, skillsJson, id]
         );
         return result.affectedRows > 0;
     },
 
     delete: async (id) => {
-        const [result] = await pool.query('DELETE FROM JOBS WHERE id = ?', [id]);
+        const [result] = await pool.query('DELETE FROM jobs WHERE id = ?', [id]);
         return result.affectedRows > 0;
     }
 };

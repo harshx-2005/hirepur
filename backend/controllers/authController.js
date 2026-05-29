@@ -33,18 +33,18 @@ exports.register = async (req, res, next) => {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
             await pool.query(
-                'UPDATE USERS SET name = ?, password = ?, role = ? WHERE id = ?',
+                'UPDATE users SET name = ?, password = ?, role = ? WHERE id = ?',
                 [name, hashedPassword, role, emailExists.id]
             );
 
             // 2. Safely verify/build profiles if missing
             if (role === 'job_seeker') {
-                const [p] = await pool.query('SELECT id FROM JOB_SEEKER_PROFILE WHERE user_id = ?', [emailExists.id]);
+                const [p] = await pool.query('SELECT id FROM job_seeker_profile WHERE user_id = ?', [emailExists.id]);
                 if (p.length === 0) {
                     await User.createJobSeekerProfile(emailExists.id);
                 }
             } else if (role === 'employer') {
-                const [p] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [emailExists.id]);
+                const [p] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [emailExists.id]);
                 if (p.length === 0) {
                     await User.createEmployerProfile(emailExists.id, { company_name, company_website, company_size, industry, company_description, location });
                 }

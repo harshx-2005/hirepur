@@ -6,7 +6,7 @@ exports.getDashboardStats = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Access denied' });
         }
 
-        const [employerProfile] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [employerProfile] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [req.user.id]);
         if (employerProfile.length === 0) {
             return res.status(200).json({
                 success: true,
@@ -22,14 +22,14 @@ exports.getDashboardStats = async (req, res) => {
         const employerId = employerProfile[0].id;
 
         // Total Jobs Posted
-        const [jobsResult] = await pool.query('SELECT COUNT(*) as total FROM JOBS WHERE employer_id = ?', [employerId]);
+        const [jobsResult] = await pool.query('SELECT COUNT(*) as total FROM jobs WHERE employer_id = ?', [employerId]);
         const totalJobs = jobsResult[0].total;
 
         // Total Applications Received
         const [appsResult] = await pool.query(`
             SELECT COUNT(*) as total 
-            FROM APPLICATIONS a 
-            JOIN JOBS j ON a.job_id = j.id 
+            FROM applications a 
+            JOIN jobs j ON a.job_id = j.id 
             WHERE j.employer_id = ?
         `, [employerId]);
         const totalApplications = appsResult[0].total;
@@ -37,8 +37,8 @@ exports.getDashboardStats = async (req, res) => {
         // Shortlisted Candidates (using 'under_review' or 'interview' or 'accepted' as shortlisted)
         const [shortlistedResult] = await pool.query(`
             SELECT COUNT(*) as total 
-            FROM APPLICATIONS a 
-            JOIN JOBS j ON a.job_id = j.id 
+            FROM applications a 
+            JOIN jobs j ON a.job_id = j.id 
             WHERE j.employer_id = ? AND a.status IN ('under_review', 'interview', 'accepted')
         `, [employerId]);
         const totalShortlisted = shortlistedResult[0].total;
@@ -66,15 +66,15 @@ exports.getDashboardStats = async (req, res) => {
 
 exports.getEmployerApplications = async (req, res) => {
     try {
-        const [employerRows] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [employerRows] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [req.user.id]);
         if (employerRows.length === 0) return res.status(200).json({ success: true, count: 0, data: [] });
         
         const employerId = employerRows[0].id;
         const [applications] = await pool.query(`
             SELECT a.*, u.name as applicant_name, u.email, j.title as job_title 
-            FROM APPLICATIONS a
-            JOIN USERS u ON a.user_id = u.id
-            JOIN JOBS j ON a.job_id = j.id
+            FROM applications a
+            JOIN users u ON a.user_id = u.id
+            JOIN jobs j ON a.job_id = j.id
             WHERE j.employer_id = ?
             ORDER BY a.applied_at DESC
         `, [employerId]);
@@ -87,13 +87,13 @@ exports.getEmployerApplications = async (req, res) => {
 
 exports.getEmployerJobs = async (req, res) => {
     try {
-        const [employerRows] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);
+        const [employerRows] = await pool.query('SELECT id FROM employer_profile WHERE user_id = ?', [req.user.id]);
         if (employerRows.length === 0) return res.status(200).json({ success: true, count: 0, data: [] });
         
         const employerId = employerRows[0].id;
         
         const [jobs] = await pool.query(`
-            SELECT * FROM JOBS 
+            SELECT * FROM jobs 
             WHERE employer_id = ? 
             ORDER BY created_at DESC
         `, [employerId]);
