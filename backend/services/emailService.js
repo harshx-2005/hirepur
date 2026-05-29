@@ -32,7 +32,7 @@ const sendEmail = async ({ to, subject, html, templateParams }) => {
     // 1. If EmailJS is configured, use the EmailJS secure HTTP REST API! (Zero-dependency & bypasses SMTP blocks)
     const emailJsServiceId = process.env.EMAILJS_SERVICE_ID || 'service_9r20tjd';
     const emailJsOtpTemplateId = process.env.EMAILJS_TEMPLATE_ID || 'template_ai4pjmn';
-    const emailJsStatusTemplateId = process.env.EMAILJS_STATUS_TEMPLATE_ID;
+    const emailJsStatusTemplateId = process.env.EMAILJS_STATUS_TEMPLATE_ID || 'template_awgs1nm';
     const emailJsPublicKey = process.env.EMAILJS_PUBLIC_KEY || 'mZHBTWxhLXWOyxmnS';
     const emailJsPrivateKey = process.env.EMAILJS_PRIVATE_KEY || 'KhjFProsPfOTPFpVYFCR2';
 
