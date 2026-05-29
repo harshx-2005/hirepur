@@ -1,13 +1,14 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Briefcase, DollarSign, Calendar, ChevronLeft, Send, ShieldCheck, Zap, Star, Globe, Building2, UserCircle2, CheckCircle, UploadCloud, FileText, Loader2, XCircle } from 'lucide-react';
+import { MapPin, Briefcase, DollarSign, Calendar, ChevronLeft, Send, ShieldCheck, Zap, Star, Globe, Building2, UserCircle2, CheckCircle, UploadCloud, FileText, Loader2, XCircle, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 
 const JobDetails = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { user } = useAuthStore();
     const [isApplying, setIsApplying] = useState(false);
@@ -32,6 +33,41 @@ const JobDetails = () => {
         },
         enabled: !!user && user.role === 'job_seeker'
     });
+
+    const { data: profileResponse } = useQuery({
+        queryKey: ['user-profile'],
+        queryFn: async () => {
+            const res = await apiClient.get('/profile/me');
+            return res.data;
+        },
+        enabled: !!user && user.role === 'job_seeker'
+    });
+
+    const isProfileComplete = (profile) => {
+        if (!profile) return false;
+        
+        let skills = profile.skills;
+        let experience = profile.experience;
+        let education = profile.education;
+        
+        if (typeof skills === 'string') {
+            try { skills = JSON.parse(skills); } catch (e) { skills = []; }
+        }
+        if (typeof experience === 'string') {
+            try { experience = JSON.parse(experience); } catch (e) { experience = []; }
+        }
+        if (typeof education === 'string') {
+            try { education = JSON.parse(education); } catch (e) { education = []; }
+        }
+
+        return (
+            !!profile.headline &&
+            !!profile.location &&
+            Array.isArray(skills) && skills.length > 0 &&
+            Array.isArray(experience) && experience.length > 0 &&
+            Array.isArray(education) && education.length > 0
+        );
+    };
 
     const hasApplied = applicationsResponse?.data?.some(app => Number(app.job_id) === Number(id)) || appSuccess;
 
@@ -190,6 +226,25 @@ const JobDetails = () => {
                                             Message Recruiter
                                         </Link>
                                     </div>
+                                ) : !isProfileComplete(profileResponse?.data) ? (
+                                    <motion.div 
+                                        key="incomplete-profile"
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="bg-amber-500/10 border-2 border-amber-500/20 rounded-[2.5rem] p-8 text-center"
+                                    >
+                                        <XCircle className="w-12 h-12 mx-auto mb-4 text-amber-500"/>
+                                        <h4 className="font-black text-base uppercase tracking-wider text-amber-900 mb-2">Setup Incomplete</h4>
+                                        <p className="text-xs font-semibold leading-relaxed text-amber-700/80 mb-6">
+                                            Please complete your professional profile (Headline, Location, Skills, Experience, and Education) to unlock applications.
+                                        </p>
+                                        <button 
+                                            onClick={() => navigate('/profile?setup_required=true')}
+                                            className="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-4 rounded-2xl transition-all shadow-lg shadow-amber-500/20 active:scale-95 text-xs uppercase tracking-widest flex items-center justify-center gap-2 group"
+                                        >
+                                            Complete Profile <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform"/>
+                                        </button>
+                                    </motion.div>
                                 ) : (
                                     <motion.div key="action" className="space-y-4">
                                         
