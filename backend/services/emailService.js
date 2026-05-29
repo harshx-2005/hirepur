@@ -31,11 +31,20 @@ transporter.verify((error) => {
 const sendEmail = async ({ to, subject, html, templateParams }) => {
     // 1. If EmailJS is configured, use the EmailJS secure HTTP REST API! (Zero-dependency & bypasses SMTP blocks)
     const emailJsServiceId = process.env.EMAILJS_SERVICE_ID || 'service_9r20tjd';
-    const emailJsTemplateId = process.env.EMAILJS_TEMPLATE_ID || 'template_ai4pjmn';
+    const emailJsOtpTemplateId = process.env.EMAILJS_TEMPLATE_ID || 'template_ai4pjmn';
+    const emailJsStatusTemplateId = process.env.EMAILJS_STATUS_TEMPLATE_ID;
     const emailJsPublicKey = process.env.EMAILJS_PUBLIC_KEY || 'mZHBTWxhLXWOyxmnS';
     const emailJsPrivateKey = process.env.EMAILJS_PRIVATE_KEY || 'KhjFProsPfOTPFpVYFCR2';
 
-    if (emailJsServiceId && emailJsTemplateId && emailJsPublicKey && templateParams && templateParams.otp_code) {
+    // Determine which EmailJS template to use based on the type of email
+    let emailJsTemplateId = null;
+    if (templateParams?.otp_code && emailJsOtpTemplateId) {
+        emailJsTemplateId = emailJsOtpTemplateId;
+    } else if (templateParams?.applicant_name && emailJsStatusTemplateId) {
+        emailJsTemplateId = emailJsStatusTemplateId;
+    }
+
+    if (emailJsServiceId && emailJsTemplateId && emailJsPublicKey && templateParams) {
         try {
             const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
                 method: 'POST',
@@ -46,7 +55,7 @@ const sendEmail = async ({ to, subject, html, templateParams }) => {
                     service_id: emailJsServiceId,
                     template_id: emailJsTemplateId,
                     user_id: emailJsPublicKey,
-                    accessToken: emailJsPrivateKey || undefined, // Securely signs the server-side request
+                    accessToken: emailJsPrivateKey || undefined,
                     template_params: templateParams
                 })
             });
@@ -55,7 +64,7 @@ const sendEmail = async ({ to, subject, html, templateParams }) => {
                 const text = await response.text();
                 throw new Error(text || `HTTP Status ${response.status}`);
             }
-            console.log(`📧 EmailJS HTTP API successfully dispatched email to ${to}`);
+            console.log(`📧 EmailJS HTTP API successfully dispatched email to ${to} (template: ${emailJsTemplateId})`);
             return { success: true };
         } catch (error) {
             console.error('📧 EmailJS HTTP dispatch error:', error.message);
