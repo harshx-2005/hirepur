@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useProfileStore } from '../store/useProfileStore';
-import { User, Mail, MapPin, Linkedin, Globe, Save, RefreshCw, Briefcase, GraduationCap, Plus, Trash2, Zap, Camera } from 'lucide-react';
+import { User, Mail, MapPin, Linkedin, Globe, Save, RefreshCw, Briefcase, GraduationCap, Plus, Trash2, Zap, Camera, Pencil, X, FileText, Upload, Download, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSearchParams } from 'react-router-dom';
 import apiClient from '../api/client';
@@ -10,10 +10,13 @@ const Profile = () => {
     const { user, setUser } = useAuthStore();
     const { profile, fetchProfile, updateProfile, isLoading, updateProfilePic } = useProfileStore();
     const [isUploading, setIsUploading] = useState(false);
+    const [isResumeUploading, setIsResumeUploading] = useState(false);
     const [searchParams] = useSearchParams();
     const queryUserId = searchParams.get('userId');
     const isReadOnly = !!queryUserId;
     const [viewUser, setViewUser] = useState(null);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [saveSuccess, setSaveSuccess] = useState(false);
     
     const [formData, setFormData] = useState({
         phone: '',
@@ -26,6 +29,7 @@ const Profile = () => {
         experience: [],
         education: [],
         projects: [],
+        resume_url: '',
         // Employer specific fields
         company_name: '',
         company_website: '',
@@ -61,6 +65,7 @@ const Profile = () => {
                             experience: typeof targetProfile.experience === 'string' ? JSON.parse(targetProfile.experience) : (targetProfile.experience || []),
                             education: typeof targetProfile.education === 'string' ? JSON.parse(targetProfile.education) : (targetProfile.education || []),
                             projects: typeof targetProfile.projects === 'string' ? JSON.parse(targetProfile.projects) : (targetProfile.projects || []),
+                            resume_url: targetProfile.resume_url || '',
                             company_name: targetProfile.company_name || '',
                             company_website: targetProfile.company_website || '',
                             company_size: targetProfile.company_size || '',
@@ -91,6 +96,7 @@ const Profile = () => {
                 experience: typeof profile.experience === 'string' ? JSON.parse(profile.experience) : (profile.experience || []),
                 education: typeof profile.education === 'string' ? JSON.parse(profile.education) : (profile.education || []),
                 projects: typeof profile.projects === 'string' ? JSON.parse(profile.projects) : (profile.projects || []),
+                resume_url: profile.resume_url || '',
                 company_name: profile.company_name || '',
                 company_website: profile.company_website || '',
                 company_size: profile.company_size || '',
@@ -101,12 +107,19 @@ const Profile = () => {
     }, [profile, isReadOnly]);
 
     const handleSave = async () => {
-        if (isReadOnly) return;
-        await updateProfile(formData);
+        if (isReadOnly || !isEditMode) return;
+        const success = await updateProfile(formData);
+        if (success) {
+            setSaveSuccess(true);
+            setTimeout(() => {
+                setSaveSuccess(false);
+                setIsEditMode(false);
+            }, 1500);
+        }
     };
 
     const handlePhotoUpload = async (e) => {
-        if (isReadOnly) return;
+        if (isReadOnly || !isEditMode) return;
         const file = e.target.files[0];
         if (!file) return;
 
@@ -127,6 +140,28 @@ const Profile = () => {
             console.error('Photo upload failed', err);
         } finally {
             setIsUploading(false);
+        }
+    };
+
+    const handleResumeUpload = async (e) => {
+        if (isReadOnly || !isEditMode) return;
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+
+        setIsResumeUploading(true);
+        try {
+            const res = await apiClient.post('/upload', uploadData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+            setFormData(prev => ({ ...prev, resume_url: res.data.url }));
+        } catch (err) {
+            console.error('Resume upload failed', err);
+            alert('Failed to upload resume. Please try again.');
+        } finally {
+            setIsResumeUploading(false);
         }
     };
 
@@ -157,6 +192,22 @@ const Profile = () => {
     const displayRole = isReadOnly ? viewUser?.role : user?.role;
     const displayPic = isReadOnly ? viewUser?.profile_pic : user?.profile_pic;
 
+    // Inputs are disabled when viewing another profile OR when not in edit mode on own profile
+    const fieldsDisabled = isReadOnly || !isEditMode;
+
+    // Extract filename from a Cloudinary URL for display
+    const getResumeDisplayName = (url) => {
+        if (!url) return null;
+        try {
+            const parts = url.split('/');
+            const filename = parts[parts.length - 1];
+            // Remove the Cloudinary hash prefix if present
+            return decodeURIComponent(filename).replace(/^v\d+\//, '');
+        } catch {
+            return 'Resume.pdf';
+        }
+    };
+
     return (
         <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto space-y-8">
@@ -175,7 +226,7 @@ const Profile = () => {
                                 )}
                             </div>
                         </div>
-                        {!isReadOnly && (
+                        {isEditMode && !isReadOnly && (
                             <label className="absolute -bottom-2 -right-2 bg-primary w-10 h-10 rounded-full border-4 border-white flex items-center justify-center cursor-pointer hover:scale-110 transition-transform shadow-lg">
                                 <input type="file" className="hidden" onChange={handlePhotoUpload} accept="image/*" />
                                 {isUploading ? <RefreshCw className="w-4 h-4 text-white animate-spin" /> : <Camera className="w-4 h-4 text-white" />}
@@ -198,6 +249,25 @@ const Profile = () => {
                         </div>
                     </div>
 
+                    {/* Edit Mode Toggle Button */}
+                    {!isReadOnly && (
+                        <div className="absolute top-6 right-6 z-10">
+                            <button
+                                onClick={() => setIsEditMode(!isEditMode)}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 shadow-lg ${
+                                    isEditMode 
+                                        ? 'bg-red-50 text-red-600 border-2 border-red-200 hover:bg-red-100' 
+                                        : 'bg-primary text-white hover:bg-primary/90 hover:scale-105'
+                                }`}
+                            >
+                                {isEditMode ? (
+                                    <><X className="w-4 h-4"/> Cancel</>
+                                ) : (
+                                    <><Pencil className="w-4 h-4"/> Edit Profile</>
+                                )}
+                            </button>
+                        </div>
+                    )}
 
                 </div>
 
@@ -218,7 +288,7 @@ const Profile = () => {
                                         placeholder="+91 98765 43210"
                                         value={formData.phone}
                                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                                        disabled={isReadOnly}
+                                        disabled={fieldsDisabled}
                                     />
                                 </div>
                                 <div>
@@ -229,7 +299,7 @@ const Profile = () => {
                                         placeholder="e.g. Aspiring Software Engineer | Recent Graduate"
                                         value={formData.headline}
                                         onChange={(e) => setFormData({...formData, headline: e.target.value})}
-                                        disabled={isReadOnly}
+                                        disabled={fieldsDisabled}
                                     />
                                 </div>
                                 <div>
@@ -240,7 +310,7 @@ const Profile = () => {
                                         placeholder="Briefly describe your professional background, academic achievements, or career goals..."
                                         value={formData.summary}
                                         onChange={(e) => setFormData({...formData, summary: e.target.value})}
-                                        disabled={isReadOnly}
+                                        disabled={fieldsDisabled}
                                     ></textarea>
                                 </div>
                                 <div>
@@ -251,7 +321,7 @@ const Profile = () => {
                                         placeholder="e.g. Mumbai, Maharashtra"
                                         value={formData.location}
                                         onChange={(e) => setFormData({...formData, location: e.target.value})}
-                                        disabled={isReadOnly}
+                                        disabled={fieldsDisabled}
                                     />
                                 </div>
                             </div>
@@ -272,7 +342,7 @@ const Profile = () => {
                                             placeholder="linkedin.com/in/username"
                                             value={formData.linkedin}
                                             onChange={(e) => setFormData({...formData, linkedin: e.target.value})}
-                                            disabled={isReadOnly}
+                                            disabled={fieldsDisabled}
                                         />
                                     </div>
                                 </div>
@@ -286,12 +356,96 @@ const Profile = () => {
                                             placeholder="your-portfolio.me"
                                             value={formData.portfolio}
                                             onChange={(e) => setFormData({...formData, portfolio: e.target.value})}
-                                            disabled={isReadOnly}
+                                            disabled={fieldsDisabled}
                                         />
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Resume Upload Card — Job Seekers Only */}
+                        {displayRole === 'job_seeker' && (
+                            <div className="glass-card">
+                                <h3 className="text-lg font-bold mb-6 flex items-center gap-2">
+                                    <FileText className="text-primary w-5 h-5"/> Resume / CV
+                                </h3>
+                                
+                                {formData.resume_url ? (
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-4 p-4 bg-green-50 border-2 border-green-100 rounded-2xl">
+                                            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                                                <FileText className="w-6 h-6 text-green-600" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-bold text-green-800 truncate">{getResumeDisplayName(formData.resume_url)}</p>
+                                                <p className="text-[10px] font-black uppercase tracking-widest text-green-500 mt-0.5">Uploaded Successfully</p>
+                                            </div>
+                                            <a 
+                                                href={formData.resume_url} 
+                                                target="_blank" 
+                                                rel="noreferrer"
+                                                className="p-2.5 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-all shadow-sm flex-shrink-0"
+                                                title="View Resume"
+                                            >
+                                                <Download className="w-4 h-4" />
+                                            </a>
+                                        </div>
+
+                                        {isEditMode && !isReadOnly && (
+                                            <label className="flex items-center justify-center gap-2 p-3 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                                                <input 
+                                                    type="file" 
+                                                    className="hidden" 
+                                                    onChange={handleResumeUpload} 
+                                                    accept=".pdf,.doc,.docx" 
+                                                />
+                                                {isResumeUploading ? (
+                                                    <RefreshCw className="w-4 h-4 text-primary animate-spin" />
+                                                ) : (
+                                                    <Upload className="w-4 h-4 text-gray-400 group-hover:text-primary transition" />
+                                                )}
+                                                <span className="text-xs font-bold text-gray-400 group-hover:text-primary transition">
+                                                    {isResumeUploading ? 'Uploading...' : 'Replace Resume'}
+                                                </span>
+                                            </label>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div>
+                                        {isEditMode && !isReadOnly ? (
+                                            <label className="flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-gray-200 rounded-2xl cursor-pointer hover:border-primary hover:bg-primary/5 transition-all group">
+                                                <input 
+                                                    type="file" 
+                                                    className="hidden" 
+                                                    onChange={handleResumeUpload} 
+                                                    accept=".pdf,.doc,.docx" 
+                                                />
+                                                <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-primary/10 transition">
+                                                    {isResumeUploading ? (
+                                                        <RefreshCw className="w-6 h-6 text-primary animate-spin" />
+                                                    ) : (
+                                                        <Upload className="w-6 h-6 text-gray-400 group-hover:text-primary transition" />
+                                                    )}
+                                                </div>
+                                                <div className="text-center">
+                                                    <p className="text-sm font-bold text-gray-700 group-hover:text-primary transition">
+                                                        {isResumeUploading ? 'Uploading...' : 'Upload Resume'}
+                                                    </p>
+                                                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">PDF, DOC, DOCX • Max 5MB</p>
+                                                </div>
+                                            </label>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center gap-3 p-8 border-2 border-dashed border-gray-100 rounded-2xl bg-gray-50/50">
+                                                <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center">
+                                                    <FileText className="w-6 h-6 text-gray-300" />
+                                                </div>
+                                                <p className="text-xs font-bold text-gray-400">No resume uploaded yet</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
 
@@ -310,7 +464,7 @@ const Profile = () => {
                                             className="input-field mt-1" 
                                             value={formData.company_name}
                                             onChange={(e) => setFormData({...formData, company_name: e.target.value})}
-                                            disabled={isReadOnly}
+                                            disabled={fieldsDisabled}
                                         />
                                     </div>
                                     <div>
@@ -322,7 +476,7 @@ const Profile = () => {
                                                 className="input-field pl-10" 
                                                 value={formData.company_website}
                                                 onChange={(e) => setFormData({...formData, company_website: e.target.value})}
-                                                disabled={isReadOnly}
+                                                disabled={fieldsDisabled}
                                             />
                                         </div>
                                     </div>
@@ -333,7 +487,7 @@ const Profile = () => {
                                             className="input-field mt-1" 
                                             value={formData.industry}
                                             onChange={(e) => setFormData({...formData, industry: e.target.value})}
-                                            disabled={isReadOnly}
+                                            disabled={fieldsDisabled}
                                         />
                                     </div>
                                     <div>
@@ -342,7 +496,7 @@ const Profile = () => {
                                             className="input-field mt-1 bg-white"
                                             value={formData.company_size}
                                             onChange={(e) => setFormData({...formData, company_size: e.target.value})}
-                                            disabled={isReadOnly}
+                                            disabled={fieldsDisabled}
                                         >
                                             <option value="">Select Size</option>
                                             <option value="1-10">1-10 employees</option>
@@ -362,7 +516,7 @@ const Profile = () => {
                                         className="input-field mt-1" 
                                         value={formData.company_description}
                                         onChange={(e) => setFormData({...formData, company_description: e.target.value})}
-                                        disabled={isReadOnly}
+                                        disabled={fieldsDisabled}
                                     ></textarea>
                                 </div>
                             </div>
@@ -374,7 +528,7 @@ const Profile = () => {
                                         <div className="flex items-center gap-2">
                                             <Zap className="text-secondary w-5 h-5 fill-secondary"/> Technical Skills
                                         </div>
-                                        {!isReadOnly && (
+                                        {isEditMode && !isReadOnly && (
                                             <button 
                                                 onClick={() => addListItem('skills', '')}
                                                 className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-primary transition"
@@ -392,9 +546,9 @@ const Profile = () => {
                                                     onChange={(e) => updateListItem('skills', idx, e.target.value)}
                                                     className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition w-32"
                                                     placeholder="Add skill..."
-                                                    disabled={isReadOnly}
+                                                    disabled={fieldsDisabled}
                                                 />
-                                                {!isReadOnly && (
+                                                {isEditMode && !isReadOnly && (
                                                     <button 
                                                         onClick={() => removeListItem('skills', idx)}
                                                         className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition shadow-lg"
@@ -404,6 +558,9 @@ const Profile = () => {
                                                 )}
                                             </div>
                                         ))}
+                                        {formData.skills.length === 0 && (
+                                            <p className="text-sm text-gray-400 font-medium italic">No skills added yet</p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -414,7 +571,7 @@ const Profile = () => {
                                             <Briefcase className="text-primary w-5 h-5"/> Experience
                                         </h3>
                                         <div className="flex items-center gap-4">
-                                            {user?.role === 'job_seeker' && !isReadOnly && (
+                                            {user?.role === 'job_seeker' && isEditMode && !isReadOnly && (
                                                 <label className="flex items-center gap-2 cursor-pointer group">
                                                     <input 
                                                         type="checkbox" 
@@ -425,7 +582,7 @@ const Profile = () => {
                                                     <span className="text-xs font-bold text-gray-500 uppercase group-hover:text-primary transition">I am a Fresher</span>
                                                 </label>
                                             )}
-                                            {!isReadOnly && (
+                                            {isEditMode && !isReadOnly && (
                                                 <button 
                                                     onClick={() => addListItem('experience', { company: '', role: '', period: '', description: '', type: isFresher && user?.role === 'job_seeker' ? 'Internship' : 'Job' })}
                                                     className="btn-outline !py-2 !px-4 text-xs flex items-center gap-2"
@@ -455,12 +612,12 @@ const Profile = () => {
                                                             className="bg-white border border-gray-200 rounded-lg px-2 py-1 text-[10px] font-bold uppercase text-gray-400 outline-none"
                                                             value={exp.type || 'Job'}
                                                             onChange={(e) => updateNestedItem('experience', idx, 'type', e.target.value)}
-                                                            disabled={isReadOnly}
+                                                            disabled={fieldsDisabled}
                                                         >
                                                             <option value="Job">Job</option>
                                                             <option value="Internship">Internship</option>
                                                         </select>
-                                                        {!isReadOnly && (
+                                                        {isEditMode && !isReadOnly && (
                                                             <button 
                                                                 onClick={() => removeListItem('experience', idx)}
                                                                 className="text-gray-300 hover:text-red-500 transition"
@@ -477,7 +634,7 @@ const Profile = () => {
                                                                 className="input-field mt-1" 
                                                                 value={exp.company}
                                                                 onChange={(e) => updateNestedItem('experience', idx, 'company', e.target.value)}
-                                                                disabled={isReadOnly}
+                                                                disabled={fieldsDisabled}
                                                             />
                                                         </div>
                                                         <div>
@@ -487,7 +644,7 @@ const Profile = () => {
                                                                 className="input-field mt-1" 
                                                                 value={exp.role}
                                                                 onChange={(e) => updateNestedItem('experience', idx, 'role', e.target.value)}
-                                                                disabled={isReadOnly}
+                                                                disabled={fieldsDisabled}
                                                             />
                                                         </div>
                                                         <div className="md:col-span-2">
@@ -498,7 +655,7 @@ const Profile = () => {
                                                                 placeholder="e.g. Jan 2021 - Present"
                                                                 value={exp.period}
                                                                 onChange={(e) => updateNestedItem('experience', idx, 'period', e.target.value)}
-                                                                disabled={isReadOnly}
+                                                                disabled={fieldsDisabled}
                                                             />
                                                         </div>
                                                         <div className="md:col-span-2">
@@ -508,7 +665,7 @@ const Profile = () => {
                                                                 className="input-field mt-1" 
                                                                 value={exp.description}
                                                                 onChange={(e) => updateNestedItem('experience', idx, 'description', e.target.value)}
-                                                                disabled={isReadOnly}
+                                                                disabled={fieldsDisabled}
                                                             ></textarea>
                                                         </div>
                                                     </div>
@@ -524,7 +681,7 @@ const Profile = () => {
                                         <div className="flex items-center gap-2">
                                             <Globe className="text-primary w-5 h-5"/> Projects
                                         </div>
-                                        {!isReadOnly && (
+                                        {isEditMode && !isReadOnly && (
                                             <button 
                                                 onClick={() => addListItem('projects', { name: '', description: '', link: '' })}
                                                 className="btn-outline !py-2 !px-4 text-xs flex items-center gap-2"
@@ -536,7 +693,7 @@ const Profile = () => {
                                     <div className="space-y-6">
                                         {formData.projects.map((proj, idx) => (
                                             <div key={idx} className="p-6 border border-gray-100 rounded-2xl bg-gray-50/20 relative group">
-                                                {!isReadOnly && (
+                                                {isEditMode && !isReadOnly && (
                                                     <button 
                                                         onClick={() => removeListItem('projects', idx)}
                                                         className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition"
@@ -552,7 +709,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={proj.name}
                                                             onChange={(e) => updateNestedItem('projects', idx, 'name', e.target.value)}
-                                                            disabled={isReadOnly}
+                                                            disabled={fieldsDisabled}
                                                         />
                                                     </div>
                                                     <div>
@@ -562,7 +719,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={proj.link}
                                                             onChange={(e) => updateNestedItem('projects', idx, 'link', e.target.value)}
-                                                            disabled={isReadOnly}
+                                                            disabled={fieldsDisabled}
                                                         />
                                                     </div>
                                                     <div>
@@ -572,7 +729,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={proj.description}
                                                             onChange={(e) => updateNestedItem('projects', idx, 'description', e.target.value)}
-                                                            disabled={isReadOnly}
+                                                            disabled={fieldsDisabled}
                                                         ></textarea>
                                                     </div>
                                                 </div>
@@ -587,7 +744,7 @@ const Profile = () => {
                                         <div className="flex items-center gap-2">
                                             <GraduationCap className="text-primary w-5 h-5"/> Education
                                         </div>
-                                        {!isReadOnly && (
+                                        {isEditMode && !isReadOnly && (
                                             <button 
                                                 onClick={() => addListItem('education', { institution: '', degree: '', year: '' })}
                                                 className="btn-outline !py-2 !px-4 text-xs flex items-center gap-2"
@@ -599,7 +756,7 @@ const Profile = () => {
                                     <div className="space-y-6">
                                         {formData.education.map((edu, idx) => (
                                             <div key={idx} className="p-6 border border-gray-100 rounded-2xl bg-gray-50/20 relative group">
-                                                {!isReadOnly && (
+                                                {isEditMode && !isReadOnly && (
                                                     <button 
                                                         onClick={() => removeListItem('education', idx)}
                                                         className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition"
@@ -615,7 +772,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={edu.institution}
                                                             onChange={(e) => updateNestedItem('education', idx, 'institution', e.target.value)}
-                                                            disabled={isReadOnly}
+                                                            disabled={fieldsDisabled}
                                                         />
                                                     </div>
                                                     <div>
@@ -625,7 +782,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={edu.degree}
                                                             onChange={(e) => updateNestedItem('education', idx, 'degree', e.target.value)}
-                                                            disabled={isReadOnly}
+                                                            disabled={fieldsDisabled}
                                                         />
                                                     </div>
                                                     <div>
@@ -635,7 +792,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={edu.year}
                                                             onChange={(e) => updateNestedItem('education', idx, 'year', e.target.value)}
-                                                            disabled={isReadOnly}
+                                                            disabled={fieldsDisabled}
                                                         />
                                                     </div>
                                                 </div>
@@ -648,19 +805,35 @@ const Profile = () => {
                     </div>
                 </div>
 
-                {/* Final Save Button */}
-                {!isReadOnly && (
-                    <div className="flex justify-center pt-8 pb-12">
-                        <button 
-                            onClick={handleSave}
-                            disabled={isLoading}
-                            className="btn-primary px-12 py-4 flex items-center gap-3 shadow-2xl shadow-primary/30 disabled:opacity-50 text-lg"
+                {/* Save Button — Only visible in Edit Mode */}
+                <AnimatePresence>
+                    {isEditMode && !isReadOnly && (
+                        <motion.div 
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            className="flex justify-center pt-8 pb-12"
                         >
-                            {isLoading ? <RefreshCw className="w-6 h-6 animate-spin" /> : <Save className="w-6 h-6" />}
-                            Save Professional Profile
-                        </button>
-                    </div>
-                )}
+                            <button 
+                                onClick={handleSave}
+                                disabled={isLoading || saveSuccess}
+                                className={`px-12 py-4 flex items-center gap-3 shadow-2xl disabled:opacity-50 text-lg rounded-2xl font-black transition-all duration-300 ${
+                                    saveSuccess 
+                                        ? 'bg-green-500 text-white shadow-green-500/30' 
+                                        : 'btn-primary shadow-primary/30'
+                                }`}
+                            >
+                                {saveSuccess ? (
+                                    <><CheckCircle className="w-6 h-6" /> Saved Successfully</>
+                                ) : isLoading ? (
+                                    <><RefreshCw className="w-6 h-6 animate-spin" /> Saving...</>
+                                ) : (
+                                    <><Save className="w-6 h-6" /> Save Changes</>
+                                )}
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );

@@ -33,7 +33,7 @@ exports.getProfile = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         if (req.user.role === 'job_seeker') {
-            const { phone, headline, summary, skills, experience, education, projects, location, linkedin, portfolio } = req.body;
+            const { phone, headline, summary, skills, experience, education, projects, location, linkedin, portfolio, resume_url } = req.body;
             await pool.query(
                 `UPDATE job_seeker_profile SET 
                 phone = ?,
@@ -45,7 +45,8 @@ exports.updateProfile = async (req, res) => {
                 projects = ?,
                 location = ?, 
                 linkedin = ?, 
-                portfolio = ? 
+                portfolio = ?,
+                resume_url = ?
                 WHERE user_id = ?`,
                 [
                     phone,
@@ -57,7 +58,8 @@ exports.updateProfile = async (req, res) => {
                     JSON.stringify(projects),
                     location, 
                     linkedin, 
-                    portfolio, 
+                    portfolio,
+                    resume_url || null,
                     req.user.id
                 ]
             );

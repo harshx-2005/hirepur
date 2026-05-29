@@ -140,6 +140,19 @@ async function migrate() {
             console.log(`🎉 Migrated ${oldMessages.length} chat logs to conversations database.`);
         }
 
+        // 9. Ensure job_seeker_profile has all required columns
+        const profileColumns = ['phone', 'summary', 'projects', 'resume_url'];
+        for (const col of profileColumns) {
+            const [colExists] = await pool.query(`SHOW COLUMNS FROM job_seeker_profile LIKE '${col}'`);
+            if (colExists.length === 0) {
+                const colType = col === 'resume_url' ? 'VARCHAR(500)' : (col === 'summary' ? 'TEXT' : (col === 'projects' ? 'JSON' : 'VARCHAR(255)'));
+                await pool.query(`ALTER TABLE job_seeker_profile ADD COLUMN ${col} ${colType}`);
+                console.log(`✔️ Added ${col} column to job_seeker_profile.`);
+            } else {
+                console.log(`✔️ ${col} column already exists in job_seeker_profile.`);
+            }
+        }
+
         console.log('🚀 Database Migration Successfully Completed.');
         if (require.main === module) {
             process.exit(0);

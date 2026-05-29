@@ -9,11 +9,11 @@ exports.uploadFile = async (req, res) => {
         }
 
         try {
-            // Attempt to upload to Cloudinary (timeout set to 8000ms for safety)
+            // Upload to Cloudinary with generous timeout for large PDFs
             const result = await cloudinary.uploader.upload(req.file.path, {
                 folder: 'hirepur',
                 resource_type: 'auto',
-                timeout: 8000
+                timeout: 15000
             });
 
             // Remove file from local temp storage on successful Cloudinary upload
@@ -27,15 +27,16 @@ exports.uploadFile = async (req, res) => {
                 public_id: result.public_id
             });
         } catch (cloudinaryError) {
-            console.warn('⚠️ Cloudinary connection timed out. Falling back to local disk storage:', cloudinaryError.message);
-            
-            // Construct secure local static URL
-            const localUrl = `http://localhost:5000/uploads/${req.file.filename}`;
-            
-            return res.status(200).json({
-                success: true,
-                url: localUrl,
-                isLocalFallback: true
+            console.error('❌ Cloudinary upload failed:', cloudinaryError.message);
+
+            // Clean up the temp file
+            if (req.file.path && fs.existsSync(req.file.path)) {
+                fs.unlinkSync(req.file.path);
+            }
+
+            return res.status(502).json({
+                success: false,
+                message: 'File upload to cloud storage failed. Please try again.'
             });
         }
     } catch (error) {
