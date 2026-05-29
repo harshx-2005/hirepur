@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const dns = require('dns');
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_SERVICE === 'gmail' || !process.env.SMTP_SERVICE ? 'smtp.gmail.com' : undefined,
@@ -9,7 +10,10 @@ const transporter = nodemailer.createTransport({
         user: process.env.SMTP_USER || process.env.EMAIL_USER,
         pass: process.env.SMTP_PASS || process.env.EMAIL_PASS
     },
-    family: 4, // Forces IPv4 connection to prevent ENETUNREACH IPv6 failures on Render
+    lookup: (hostname, options, callback) => {
+        // Enforce IPv4 by overriding family to 4
+        dns.lookup(hostname, { family: 4 }, callback);
+    },
     connectionTimeout: 5000, // 5 seconds connection timeout
     socketTimeout: 5000,     // 5 seconds socket inactivity timeout
     greetingTimeout: 5000    // 5 seconds greeting timeout
