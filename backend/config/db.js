@@ -19,6 +19,27 @@ async function connectDB() {
     const connection = await pool.getConnection();
     console.log(`✅ MySQL Database Connected: ${process.env.DB_NAME}`);
     connection.release();
+
+    // Self-healing: Automatically check and seed default administrator user if missing
+    try {
+      const [rows] = await pool.query("SELECT id FROM USERS WHERE email = 'admin@gmail.com' LIMIT 1");
+      if (rows.length === 0) {
+        console.log("🌱 Default admin user missing. Seeding System Admin...");
+        const bcrypt = require('bcryptjs');
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash('admin123', salt);
+        await pool.query(
+          "INSERT INTO USERS (name, email, password, role, is_verified) VALUES ('System Admin', 'admin@gmail.com', ?, 'admin', 1)",
+          [hashedPassword]
+        );
+        console.log("🌱 System Admin successfully seeded in database!");
+      } else {
+        console.log("✔️ System Admin check: Verified and active.");
+      }
+    } catch (dbErr) {
+      console.error("⚠️ Seeder warning (table might be missing/unmigrated):", dbErr.message);
+    }
+
   } catch (error) {
     if (error.code === "ER_BAD_DB_ERROR") {
       console.log(
