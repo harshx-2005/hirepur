@@ -177,4 +177,97 @@ const sendOtpEmail = async (email, otp, type = 'registration') => {
     });
 };
 
-module.exports = { sendEmail, sendOtpEmail };
+const sendApplicationStatusUpdate = async (email, name, jobTitle, status) => {
+    const formattedStatus = status.replace('_', ' ').toUpperCase();
+    const subject = `[HirePur] Application Status Update: ${formattedStatus}`;
+    
+    let statusColor = '#475569'; // Slate for applied
+    let statusText = 'Applied';
+    let statusDescription = 'Your application has been successfully submitted and is in the recruiter queue.';
+
+    if (status === 'under_review') {
+        statusColor = '#2563eb'; // Blue
+        statusText = 'Under Review';
+        statusDescription = 'The recruitment team is actively reviewing your application, qualifications, and profile details.';
+    } else if (status === 'interview') {
+        statusColor = '#9333ea'; // Shortlist / Interview
+        statusText = 'Shortlisted';
+        statusDescription = 'Congratulations! You have been shortlisted. The hiring manager will contact you shortly to schedule an interview.';
+    } else if (status === 'accepted') {
+        statusColor = '#16a34a'; // Green
+        statusText = 'Hired';
+        statusDescription = 'Excellent news! You have been selected for this position. The onboarding team will be in touch with your formal offer letters shortly.';
+    } else if (status === 'rejected') {
+        statusColor = '#dc2626'; // Red
+        statusText = 'Rejected';
+        statusDescription = 'Thank you for your interest in this role. Unfortunately, after careful review, we have decided to pursue other candidates whose profiles align more closely with our current requirements.';
+    }
+
+    const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Application Status Update</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 24px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); overflow: hidden; border: 1px solid #f1f5f9;">
+            <tr>
+                <td style="padding: 40px; text-align: center; background-color: #0f172a; color: #ffffff;">
+                    <h1 style="margin: 0; font-size: 32px; font-weight: 900; letter-spacing: -0.05em; color: #ffffff;">HirePur</h1>
+                    <p style="margin: 5px 0 0 0; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3em; color: #3b82f6;">AI Recruitment</p>
+                </td>
+            </tr>
+            <tr>
+                <td style="padding: 40px 48px;">
+                    <h2 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 800; color: #0f172a; letter-spacing: -0.03em;">Hello ${name},</h2>
+                    <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #475569; font-weight: 500;">
+                        There has been an update to your application status for the position of <strong style="color: #0f172a;">${jobTitle}</strong>.
+                    </p>
+                    
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 24px;">
+                        <tr>
+                            <td align="center" style="padding: 24px; background-color: #f8fafc; border-radius: 20px; border: 1px solid #e2e8f0;">
+                                <div style="font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; margin-bottom: 8px;">New Status</div>
+                                <div style="display: inline-block; padding: 6px 16px; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: #ffffff; background-color: ${statusColor}; border-radius: 9999px;">
+                                    ${statusText}
+                                </div>
+                                <p style="margin: 16px 0 0 0; font-size: 13px; line-height: 1.5; color: #475569; font-weight: 500; max-width: 400px;">
+                                    ${statusDescription}
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <p style="margin: 0 0 30px 0; font-size: 13px; line-height: 1.6; color: #64748b; font-weight: 500;">
+                        Log in to your candidate dashboard to view more details, check your application timeline, or message the recruiter directly.
+                    </p>
+                    
+                    <hr style="border: none; border-top: 1px solid #e2e8f0; margin-bottom: 24px;">
+                    <p style="margin: 0; font-size: 11px; text-align: center; color: #94a3b8; font-weight: 500;">
+                        © ${new Date().getFullYear()} HirePur Inc. All rights reserved. <br>
+                        Premium Recruiting Platform & SaaS.
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </body>
+    </html>
+    `;
+
+    return sendEmail({
+        to: email,
+        subject: subject,
+        html: htmlContent,
+        templateParams: {
+            to_email: email,
+            subject: subject,
+            applicant_name: name,
+            job_title: jobTitle,
+            status_text: statusText,
+            status_description: statusDescription
+        }
+    });
+};
+
+module.exports = { sendEmail, sendOtpEmail, sendApplicationStatusUpdate };
