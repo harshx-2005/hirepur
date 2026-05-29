@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNotificationStore } from '../store/useNotificationStore';
 import { Briefcase, LogOut, User, Menu, Bell, Sparkles } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
@@ -18,6 +18,23 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close notifications dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
 
   // Sync notifications on authentication change
   useEffect(() => {
@@ -51,7 +68,7 @@ const Navbar = () => {
            <div className="flex items-center gap-6">
                 
                 {/* 1. Live Notification Bell & Dropdown */}
-                <div className="relative">
+                <div className="relative" ref={dropdownRef}>
                     <button 
                         onClick={() => setShowNotifications(!showNotifications)}
                         className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors duration-200"
