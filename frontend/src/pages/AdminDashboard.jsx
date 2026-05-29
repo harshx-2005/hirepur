@@ -99,11 +99,18 @@ const AdminDashboard = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }}>
-                    <Activity className="w-12 h-12 text-primary" />
+            <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center gap-6 text-white">
+                <motion.div 
+                    animate={{ rotate: 360 }} 
+                    transition={{ repeat: Infinity, duration: 3, ease: "linear" }}
+                    className="bg-primary/20 p-6 rounded-[2rem] border border-primary/20 shadow-2xl shadow-primary/20"
+                >
+                    <ShieldCheck className="w-12 h-12 text-primary" />
                 </motion.div>
-                <span className="ml-4 font-bold text-slate-400 uppercase tracking-widest text-xs">Initialising High-Level Access...</span>
+                <div className="text-center space-y-2">
+                    <h2 className="text-sm font-black uppercase tracking-[0.25em] text-primary animate-pulse">Initialising High-Level Access...</h2>
+                    <p className="text-slate-500 font-bold text-[9px] uppercase tracking-widest">SECURE HANDSHAKE HP-ADM-SECURE-882...</p>
+                </div>
             </div>
         );
     }

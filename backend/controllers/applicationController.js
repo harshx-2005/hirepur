@@ -23,6 +23,32 @@ exports.applyForJob = async (req, res) => {
         const resume_url = req.body.resume_url || req.file?.path || null;
 
         const applicationId = await Application.create({ job_id, user_id, resume_url, cover_letter });
+
+        // Real-time Notification Gating: Notify the Employer
+        try {
+            const message = `${req.user.name} applied for your job: ${job.title}`;
+            const [notifResult] = await pool.query(
+                `INSERT INTO NOTIFICATIONS (user_id, message, type, related_id) 
+                 VALUES (?, ?, 'application', ?)`,
+                [job.employer_user_id, message, job.id]
+            );
+            
+            const notifObj = {
+                id: notifResult.insertId,
+                message,
+                type: 'application',
+                related_id: job.id,
+                is_read: 0,
+                created_at: new Date()
+            };
+
+            if (req.io) {
+                req.io.to(`user_${job.employer_user_id}`).emit('receive_notification', notifObj);
+            }
+        } catch (notifErr) {
+            console.error('⚠️ Live Notification Dispatch Error:', notifErr.message);
+        }
+
         res.status(201).json({ success: true, message: 'Application submitted', data: { id: applicationId } });
     } catch (error) {
         console.error(error);
@@ -81,6 +107,32 @@ exports.updateApplicationStatus = async (req, res) => {
 
 
         await Application.updateStatus(applicationId, status);
+
+        // Real-time Notification Gating: Notify the Candidate
+        try {
+            const formattedStatus = status.replace('_', ' ').toUpperCase();
+            const message = `Your application for ${job.title} has been updated to: ${formattedStatus}`;
+            const [notifResult] = await pool.query(
+                `INSERT INTO NOTIFICATIONS (user_id, message, type, related_id) 
+                 VALUES (?, ?, 'status_change', ?)`,
+                [application.user_id, message, application.id]
+            );
+            
+            const notifObj = {
+                id: notifResult.insertId,
+                message,
+                type: 'status_change',
+                related_id: application.id,
+                is_read: 0,
+                created_at: new Date()
+            };
+
+            if (req.io) {
+                req.io.to(`user_${application.user_id}`).emit('receive_notification', notifObj);
+            }
+        } catch (notifErr) {
+            console.error('⚠️ Status Notification Dispatch Error:', notifErr.message);
+        }
 
         // Fetch applicant details for email
         const [userRows] = await pool.query('SELECT name, email FROM USERS WHERE id = ?', [application.user_id]);

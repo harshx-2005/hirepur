@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
 import apiClient from '../api/client';
+import { useNotificationStore } from './useNotificationStore';
 
 const SOCKET_URL = import.meta.env.VITE_API_URL
     ? import.meta.env.VITE_API_URL.replace(/\/api$/, '')
@@ -135,6 +136,12 @@ export const useChatStore = create((set, get) => ({
         // Register core socket listeners
         socket.on('connect', () => {
             console.log('⚡ Socket connected successfully.');
+        });
+
+        // Live Realtime Notification dispatcher
+        socket.on('receive_notification', (notif) => {
+            console.log('🔔 Live notification received:', notif);
+            useNotificationStore.getState().addNotification(notif);
         });
 
         // Received online list

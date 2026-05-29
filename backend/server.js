@@ -169,6 +169,11 @@ const startServer = async () => {
         });
 
         // 4. Mount REST API Routes
+        app.use((req, res, next) => {
+            req.io = io;
+            next();
+        });
+
         app.get('/', (req, res) => {
           res.send('HirePur Enterprise API is running...');
         });
