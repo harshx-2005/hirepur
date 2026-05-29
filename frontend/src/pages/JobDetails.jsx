@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Briefcase, DollarSign, Calendar, ChevronLeft, Send, ShieldCheck, Zap, Star, Globe, Building2, UserCircle2, CheckCircle, UploadCloud, FileText, Loader2, XCircle, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 
 const JobDetails = () => {
@@ -42,6 +42,23 @@ const JobDetails = () => {
         },
         enabled: !!user && user.role === 'job_seeker'
     });
+
+    useEffect(() => {
+        if (profileResponse?.data?.resume_url) {
+            const isLocalhostClient = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const isValid = !profileResponse.data.resume_url.includes('localhost') || isLocalhostClient;
+            if (isValid) {
+                setResumeUrl(profileResponse.data.resume_url);
+                try {
+                    const parts = profileResponse.data.resume_url.split('/');
+                    const filename = parts[parts.length - 1];
+                    setResumeFile({ name: decodeURIComponent(filename).replace(/^v\d+\//, '') });
+                } catch {
+                    setResumeFile({ name: 'Saved Profile Resume' });
+                }
+            }
+        }
+    }, [profileResponse]);
 
     const isProfileComplete = (profile) => {
         if (!profile) return false;

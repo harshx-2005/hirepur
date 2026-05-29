@@ -23,14 +23,19 @@ const Application = {
     },
 
     findByJob: async (jobId) => {
+        const isProduction = process.env.NODE_ENV === 'production';
         const [rows] = await pool.query(`
-            SELECT a.*, u.name, u.email, p.headline, p.skills, p.experience, p.education 
+            SELECT a.*, u.name, u.email, p.headline, p.skills, p.experience, p.education,
+                COALESCE(
+                    CASE WHEN ? = 'production' AND a.resume_url LIKE 'http://localhost%' THEN NULL ELSE a.resume_url END,
+                    p.resume_url
+                ) as resume_url
             FROM applications a 
             JOIN users u ON a.user_id = u.id 
             JOIN job_seeker_profile p ON u.id = p.user_id 
             WHERE a.job_id = ?
             ORDER BY a.applied_at DESC
-        `, [jobId]);
+        `, [isProduction ? 'production' : 'development', jobId]);
         return rows;
     },
 

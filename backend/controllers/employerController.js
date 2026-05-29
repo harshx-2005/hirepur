@@ -70,14 +70,20 @@ exports.getEmployerApplications = async (req, res) => {
         if (employerRows.length === 0) return res.status(200).json({ success: true, count: 0, data: [] });
         
         const employerId = employerRows[0].id;
+        const isProduction = process.env.NODE_ENV === 'production';
         const [applications] = await pool.query(`
-            SELECT a.*, u.name as applicant_name, u.email, j.title as job_title 
+            SELECT a.*, u.name as applicant_name, u.email, j.title as job_title,
+                COALESCE(
+                    CASE WHEN ? = 'production' AND a.resume_url LIKE 'http://localhost%' THEN NULL ELSE a.resume_url END,
+                    jsp.resume_url
+                ) as resume_url
             FROM applications a
             JOIN users u ON a.user_id = u.id
             JOIN jobs j ON a.job_id = j.id
+            LEFT JOIN job_seeker_profile jsp ON a.user_id = jsp.user_id
             WHERE j.employer_id = ?
             ORDER BY a.applied_at DESC
-        `, [employerId]);
+        `, [isProduction ? 'production' : 'development', employerId]);
 
         res.status(200).json({ success: true, count: applications.length, data: applications });
     } catch (error) {
