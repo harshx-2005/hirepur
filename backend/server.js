@@ -54,6 +54,18 @@ const startServer = async () => {
     try {
         await connectDB();
 
+        // Auto-run Database Migrations on Startup
+        try {
+            const runMigrations = require('./database/migrate-db');
+            runMigrations().then(() => {
+                console.log('✅ Production Database Migrations verified.');
+            }).catch(err => {
+                console.error('❌ Startup Database Migration Failed:', err);
+            });
+        } catch (migError) {
+            console.error('⚠️ Could not load database migrations module:', migError);
+        }
+
         // Advanced Socket.IO setup with strict CORS rules
         const io = new Server(server, {
           cors: {

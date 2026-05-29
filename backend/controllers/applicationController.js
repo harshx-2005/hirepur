@@ -98,6 +98,7 @@ exports.updateApplicationStatus = async (req, res) => {
         if (!application) return res.status(404).json({ success: false, message: 'Application not found' });
 
         const job = await Job.findById(application.job_id);
+        if (!job) return res.status(404).json({ success: false, message: 'Job not found for this application' });
 
         // Verify employer owns job
         const [employerRows] = await pool.query('SELECT id FROM EMPLOYER_PROFILE WHERE user_id = ?', [req.user.id]);

@@ -141,11 +141,21 @@ async function migrate() {
         }
 
         console.log('🚀 Database Migration Successfully Completed.');
-        process.exit(0);
+        if (require.main === module) {
+            process.exit(0);
+        }
     } catch (error) {
         console.error('❌ Migration Error:', error);
-        process.exit(1);
+        if (require.main === module) {
+            process.exit(1);
+        } else {
+            throw error;
+        }
     }
 }
 
-migrate();
+if (require.main === module) {
+    migrate();
+} else {
+    module.exports = migrate;
+}
