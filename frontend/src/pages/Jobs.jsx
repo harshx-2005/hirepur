@@ -4,8 +4,10 @@ import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Briefcase, DollarSign, Search, Filter, ChevronRight, Star, SlidersHorizontal, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useAuthStore } from '../store/useAuthStore';
 
 const Jobs = () => {
+    const { user } = useAuthStore();
     const [search, setSearch] = useState('');
     const [location, setLocation] = useState('');
     const [page, setPage] = useState(1);
@@ -91,7 +93,7 @@ const Jobs = () => {
                         <div className="space-y-16">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {filteredJobs.map((job, index) => (
-                                    <JobCard key={job.id} job={job} index={index}/>
+                                    <JobCard key={job.id} job={job} index={index} user={user}/>
                                 ))}
                             </div>
                             
@@ -137,42 +139,52 @@ const Jobs = () => {
     );
 };
 
-const JobCard = ({ job, index }) => (
-    <motion.div 
-        layout
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: index * 0.05 }}
-        className="glass-card flex flex-col hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group relative"
-    >
-        <div className="absolute top-8 right-8 text-slate-200 group-hover:text-primary transition-colors">
-            <Star className="w-5 h-5"/>
-        </div>
+const JobCard = ({ job, index, user }) => {
+    const isCandidate = !user || user.role === 'job_seeker';
 
-        <div className="flex items-center gap-4 mb-8">
-            <div className="w-14 h-14 bg-slate-50 rounded-[1.25rem] flex items-center justify-center border border-slate-100 font-black text-slate-400 text-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
-                 {job.company_name?.[0]}
+    return (
+        <motion.div 
+            layout
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+            className="glass-card flex flex-col hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group relative"
+        >
+            <div className="absolute top-8 right-8 text-slate-200 group-hover:text-primary transition-colors">
+                <Star className="w-5 h-5"/>
             </div>
-            <div>
-                 <span className="badge bg-slate-50 text-slate-500 mb-1 inline-block">{job.job_type || 'Full-time'}</span>
-                 <h3 className="text-xl font-black text-slate-900 group-hover:text-primary transition-colors line-clamp-1">{job.title}</h3>
-            </div>
-        </div>
 
-        <div className="space-y-4 mb-8 flex-grow">
-            <div className="flex items-center gap-2 text-slate-500 font-bold text-xs uppercase tracking-widest">
-                <MapPin className="w-4 h-4 text-slate-300"/> {job.location} • {job.work_mode || 'Remote'}
+            <div className="flex items-center gap-4 mb-8">
+                <div className="w-14 h-14 bg-slate-50 rounded-[1.25rem] flex items-center justify-center border border-slate-100 font-black text-slate-400 text-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
+                     {job.company_name?.[0]}
+                </div>
+                <div>
+                     <span className="badge bg-slate-50 text-slate-500 mb-1 inline-block">{job.job_type || 'Full-time'}</span>
+                     <h3 className="text-xl font-black text-slate-900 group-hover:text-primary transition-colors line-clamp-1">{job.title}</h3>
+                </div>
             </div>
-            <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest text-[#2563eb]">
-                <span className="text-lg">₹</span> {job.salary_range || 'Competitive Pay'}
-            </div>
-        </div>
 
-        <div className="flex gap-4 pt-8 border-t border-slate-50">
-            <Link to={`/jobs/${job.id}`} className="btn-outline !py-3 !px-0 flex-1 !text-sm flex items-center justify-center border-slate-200 border text-slate-700 hover:bg-slate-50 rounded-xl">View Insights</Link>
-            <button className="btn-primary !py-3 !px-0 flex-1 !text-sm flex items-center justify-center bg-blue-600 text-white rounded-xl">Apply <ArrowRight className="w-4 h-4 ml-2"/></button>
-        </div>
-    </motion.div>
-);
+            <div className="space-y-4 mb-8 flex-grow">
+                <div className="flex items-center gap-2 text-slate-500 font-bold text-xs uppercase tracking-widest">
+                    <MapPin className="w-4 h-4 text-slate-300"/> {job.location} • {job.work_mode || 'Remote'}
+                </div>
+                <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest text-[#2563eb]">
+                    <span className="text-lg">₹</span> {job.salary_range || 'Competitive Pay'}
+                </div>
+            </div>
+
+            <div className="flex gap-4 pt-8 border-t border-slate-50">
+                {isCandidate ? (
+                    <>
+                        <Link to={`/jobs/${job.id}`} className="btn-outline !py-3 !px-0 flex-1 !text-sm flex items-center justify-center border-slate-200 border text-slate-700 hover:bg-slate-50 rounded-xl">View Insights</Link>
+                        <Link to={`/jobs/${job.id}`} className="btn-primary !py-3 !px-0 flex-1 !text-sm flex items-center justify-center bg-blue-600 text-white rounded-xl">Apply <ArrowRight className="w-4 h-4 ml-2"/></Link>
+                    </>
+                ) : (
+                    <Link to={`/jobs/${job.id}`} className="btn-primary w-full !py-3 !px-0 !text-sm flex items-center justify-center bg-blue-600 text-white rounded-xl">View Insights & Analytics <ArrowRight className="w-4 h-4 ml-2"/></Link>
+                )}
+            </div>
+        </motion.div>
+    );
+};
 
 export default Jobs;

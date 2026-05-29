@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Briefcase, FileText, BarChart3, ShieldCheck, ChevronRight, Activity, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
 
 const StatusBadge = ({ status }) => {
@@ -323,8 +324,8 @@ const AdminDashboard = () => {
                     <div className="grid gap-6">
                         {jobs.map((job) => (
                             <div key={job.id} className="bg-white p-6 rounded-3xl border border-slate-100 flex justify-between items-center group hover:border-primary/20 transition-all">
-                                <div>
-                                    <h4 className="text-xl font-bold text-slate-900 group-hover:text-primary transition-colors">{job.title}</h4>
+                                <Link to={`/jobs/${job.id}`} className="flex-grow block text-left group-hover:opacity-90">
+                                    <h4 className="text-xl font-bold text-slate-900 group-hover:text-primary transition-colors hover:underline">{job.title}</h4>
                                     <div className="flex items-center gap-4 mt-2">
                                         <p className="text-slate-400 font-bold text-xs uppercase tracking-widest flex items-center gap-1">
                                             <Briefcase className="w-3 h-3" /> {job.company_name}
@@ -333,7 +334,7 @@ const AdminDashboard = () => {
                                             <Activity className="w-3 h-3" /> {job.job_type}
                                         </p>
                                     </div>
-                                </div>
+                                </Link>
                                 <div className="flex items-center gap-4">
                                     <button 
                                         onClick={() => handleDeleteJob(job.id)}
