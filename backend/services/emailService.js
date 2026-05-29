@@ -31,7 +31,7 @@ const sendEmail = async ({ to, subject, html, templateParams }) => {
     const emailJsPublicKey = process.env.EMAILJS_PUBLIC_KEY || 'mZHBTWxhLXWOyxmnS';
     const emailJsPrivateKey = process.env.EMAILJS_PRIVATE_KEY || 'KhjFProsPfOTPFpVYFCR2';
 
-    if (emailJsServiceId && emailJsTemplateId && emailJsPublicKey && templateParams) {
+    if (emailJsServiceId && emailJsTemplateId && emailJsPublicKey && templateParams && templateParams.otp_code) {
         try {
             const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
                 method: 'POST',
