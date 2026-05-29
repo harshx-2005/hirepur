@@ -19,8 +19,28 @@ const ApplicationReview = () => {
         mutationFn: async ({ id, status }) => {
             return await apiClient.put(`/applications/${id}/status`, { status });
         },
-        onSuccess: () => {
+        onMutate: async (newAppStatus) => {
+            await queryClient.cancelQueries({ queryKey: ['all-applications'] });
+            const previousApps = queryClient.getQueryData(['all-applications']);
+            queryClient.setQueryData(['all-applications'], (old) => {
+                if (!old || !old.data) return old;
+                return {
+                    ...old,
+                    data: old.data.map(app => 
+                        app.id === newAppStatus.id ? { ...app, status: newAppStatus.status } : app
+                    )
+                };
+            });
+            return { previousApps };
+        },
+        onError: (err, newAppStatus, context) => {
+            if (context?.previousApps) {
+                queryClient.setQueryData(['all-applications'], context.previousApps);
+            }
+        },
+        onSettled: () => {
             queryClient.invalidateQueries({ queryKey: ['all-applications'] });
+            queryClient.invalidateQueries({ queryKey: ['employer-applications'] });
         }
     });
 

@@ -218,6 +218,7 @@ const Profile = () => {
                                         placeholder="+91 98765 43210"
                                         value={formData.phone}
                                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                        disabled={isReadOnly}
                                     />
                                 </div>
                                 <div>
@@ -228,6 +229,7 @@ const Profile = () => {
                                         placeholder="e.g. Aspiring Software Engineer | Recent Graduate"
                                         value={formData.headline}
                                         onChange={(e) => setFormData({...formData, headline: e.target.value})}
+                                        disabled={isReadOnly}
                                     />
                                 </div>
                                 <div>
@@ -238,6 +240,7 @@ const Profile = () => {
                                         placeholder="Briefly describe your professional background, academic achievements, or career goals..."
                                         value={formData.summary}
                                         onChange={(e) => setFormData({...formData, summary: e.target.value})}
+                                        disabled={isReadOnly}
                                     ></textarea>
                                 </div>
                                 <div>
@@ -248,6 +251,7 @@ const Profile = () => {
                                         placeholder="e.g. Mumbai, Maharashtra"
                                         value={formData.location}
                                         onChange={(e) => setFormData({...formData, location: e.target.value})}
+                                        disabled={isReadOnly}
                                     />
                                 </div>
                             </div>
@@ -268,6 +272,7 @@ const Profile = () => {
                                             placeholder="linkedin.com/in/username"
                                             value={formData.linkedin}
                                             onChange={(e) => setFormData({...formData, linkedin: e.target.value})}
+                                            disabled={isReadOnly}
                                         />
                                     </div>
                                 </div>
@@ -281,6 +286,7 @@ const Profile = () => {
                                             placeholder="your-portfolio.me"
                                             value={formData.portfolio}
                                             onChange={(e) => setFormData({...formData, portfolio: e.target.value})}
+                                            disabled={isReadOnly}
                                         />
                                     </div>
                                 </div>
@@ -304,6 +310,7 @@ const Profile = () => {
                                             className="input-field mt-1" 
                                             value={formData.company_name}
                                             onChange={(e) => setFormData({...formData, company_name: e.target.value})}
+                                            disabled={isReadOnly}
                                         />
                                     </div>
                                     <div>
@@ -315,6 +322,7 @@ const Profile = () => {
                                                 className="input-field pl-10" 
                                                 value={formData.company_website}
                                                 onChange={(e) => setFormData({...formData, company_website: e.target.value})}
+                                                disabled={isReadOnly}
                                             />
                                         </div>
                                     </div>
@@ -325,6 +333,7 @@ const Profile = () => {
                                             className="input-field mt-1" 
                                             value={formData.industry}
                                             onChange={(e) => setFormData({...formData, industry: e.target.value})}
+                                            disabled={isReadOnly}
                                         />
                                     </div>
                                     <div>
@@ -333,6 +342,7 @@ const Profile = () => {
                                             className="input-field mt-1 bg-white"
                                             value={formData.company_size}
                                             onChange={(e) => setFormData({...formData, company_size: e.target.value})}
+                                            disabled={isReadOnly}
                                         >
                                             <option value="">Select Size</option>
                                             <option value="1-10">1-10 employees</option>
@@ -352,6 +362,7 @@ const Profile = () => {
                                         className="input-field mt-1" 
                                         value={formData.company_description}
                                         onChange={(e) => setFormData({...formData, company_description: e.target.value})}
+                                        disabled={isReadOnly}
                                     ></textarea>
                                 </div>
                             </div>
@@ -363,12 +374,14 @@ const Profile = () => {
                                         <div className="flex items-center gap-2">
                                             <Zap className="text-secondary w-5 h-5 fill-secondary"/> Technical Skills
                                         </div>
-                                        <button 
-                                            onClick={() => addListItem('skills', '')}
-                                            className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-primary transition"
-                                        >
-                                            <Plus className="w-5 h-5"/>
-                                        </button>
+                                        {!isReadOnly && (
+                                            <button 
+                                                onClick={() => addListItem('skills', '')}
+                                                className="p-2 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-primary transition"
+                                            >
+                                                <Plus className="w-5 h-5"/>
+                                            </button>
+                                        )}
                                     </h3>
                                     <div className="flex flex-wrap gap-3">
                                         {formData.skills.map((skill, idx) => (
@@ -379,13 +392,16 @@ const Profile = () => {
                                                     onChange={(e) => updateListItem('skills', idx, e.target.value)}
                                                     className="bg-gray-50 border border-gray-100 rounded-xl px-4 py-2 text-sm font-bold text-gray-700 focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition w-32"
                                                     placeholder="Add skill..."
+                                                    disabled={isReadOnly}
                                                 />
-                                                <button 
-                                                    onClick={() => removeListItem('skills', idx)}
-                                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition shadow-lg"
-                                                >
-                                                    <Trash2 className="w-3 h-3"/>
-                                                </button>
+                                                {!isReadOnly && (
+                                                    <button 
+                                                        onClick={() => removeListItem('skills', idx)}
+                                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition shadow-lg"
+                                                    >
+                                                        <Trash2 className="w-3 h-3"/>
+                                                    </button>
+                                                )}
                                             </div>
                                         ))}
                                     </div>
@@ -398,7 +414,7 @@ const Profile = () => {
                                             <Briefcase className="text-primary w-5 h-5"/> Experience
                                         </h3>
                                         <div className="flex items-center gap-4">
-                                            {user?.role === 'job_seeker' && (
+                                            {user?.role === 'job_seeker' && !isReadOnly && (
                                                 <label className="flex items-center gap-2 cursor-pointer group">
                                                     <input 
                                                         type="checkbox" 
@@ -409,12 +425,14 @@ const Profile = () => {
                                                     <span className="text-xs font-bold text-gray-500 uppercase group-hover:text-primary transition">I am a Fresher</span>
                                                 </label>
                                             )}
-                                            <button 
-                                                onClick={() => addListItem('experience', { company: '', role: '', period: '', description: '', type: isFresher && user?.role === 'job_seeker' ? 'Internship' : 'Job' })}
-                                                className="btn-outline !py-2 !px-4 text-xs flex items-center gap-2"
-                                            >
-                                                <Plus className="w-4 h-4"/> Add {isFresher && user?.role === 'job_seeker' ? 'Internship' : 'Work'}
-                                            </button>
+                                            {!isReadOnly && (
+                                                <button 
+                                                    onClick={() => addListItem('experience', { company: '', role: '', period: '', description: '', type: isFresher && user?.role === 'job_seeker' ? 'Internship' : 'Job' })}
+                                                    className="btn-outline !py-2 !px-4 text-xs flex items-center gap-2"
+                                                >
+                                                    <Plus className="w-4 h-4"/> Add {isFresher && user?.role === 'job_seeker' ? 'Internship' : 'Work'}
+                                                </button>
+                                            )}
                                         </div>
                                     </div>
                                     
@@ -437,16 +455,19 @@ const Profile = () => {
                                                             className="bg-white border border-gray-200 rounded-lg px-2 py-1 text-[10px] font-bold uppercase text-gray-400 outline-none"
                                                             value={exp.type || 'Job'}
                                                             onChange={(e) => updateNestedItem('experience', idx, 'type', e.target.value)}
+                                                            disabled={isReadOnly}
                                                         >
                                                             <option value="Job">Job</option>
                                                             <option value="Internship">Internship</option>
                                                         </select>
-                                                        <button 
-                                                            onClick={() => removeListItem('experience', idx)}
-                                                            className="text-gray-300 hover:text-red-500 transition"
-                                                        >
-                                                            <Trash2 className="w-5 h-5"/>
-                                                        </button>
+                                                        {!isReadOnly && (
+                                                            <button 
+                                                                onClick={() => removeListItem('experience', idx)}
+                                                                className="text-gray-300 hover:text-red-500 transition"
+                                                            >
+                                                                <Trash2 className="w-5 h-5"/>
+                                                            </button>
+                                                        )}
                                                     </div>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                                                         <div>
@@ -456,6 +477,7 @@ const Profile = () => {
                                                                 className="input-field mt-1" 
                                                                 value={exp.company}
                                                                 onChange={(e) => updateNestedItem('experience', idx, 'company', e.target.value)}
+                                                                disabled={isReadOnly}
                                                             />
                                                         </div>
                                                         <div>
@@ -465,6 +487,7 @@ const Profile = () => {
                                                                 className="input-field mt-1" 
                                                                 value={exp.role}
                                                                 onChange={(e) => updateNestedItem('experience', idx, 'role', e.target.value)}
+                                                                disabled={isReadOnly}
                                                             />
                                                         </div>
                                                         <div className="md:col-span-2">
@@ -475,6 +498,7 @@ const Profile = () => {
                                                                 placeholder="e.g. Jan 2021 - Present"
                                                                 value={exp.period}
                                                                 onChange={(e) => updateNestedItem('experience', idx, 'period', e.target.value)}
+                                                                disabled={isReadOnly}
                                                             />
                                                         </div>
                                                         <div className="md:col-span-2">
@@ -484,6 +508,7 @@ const Profile = () => {
                                                                 className="input-field mt-1" 
                                                                 value={exp.description}
                                                                 onChange={(e) => updateNestedItem('experience', idx, 'description', e.target.value)}
+                                                                disabled={isReadOnly}
                                                             ></textarea>
                                                         </div>
                                                     </div>
@@ -499,22 +524,26 @@ const Profile = () => {
                                         <div className="flex items-center gap-2">
                                             <Globe className="text-primary w-5 h-5"/> Projects
                                         </div>
-                                        <button 
-                                            onClick={() => addListItem('projects', { name: '', description: '', link: '' })}
-                                            className="btn-outline !py-2 !px-4 text-xs flex items-center gap-2"
-                                        >
-                                            <Plus className="w-4 h-4"/> Add Project
-                                        </button>
+                                        {!isReadOnly && (
+                                            <button 
+                                                onClick={() => addListItem('projects', { name: '', description: '', link: '' })}
+                                                className="btn-outline !py-2 !px-4 text-xs flex items-center gap-2"
+                                            >
+                                                <Plus className="w-4 h-4"/> Add Project
+                                            </button>
+                                        )}
                                     </h3>
                                     <div className="space-y-6">
                                         {formData.projects.map((proj, idx) => (
                                             <div key={idx} className="p-6 border border-gray-100 rounded-2xl bg-gray-50/20 relative group">
-                                                <button 
-                                                    onClick={() => removeListItem('projects', idx)}
-                                                    className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition"
-                                                >
-                                                    <Trash2 className="w-5 h-5"/>
-                                                </button>
+                                                {!isReadOnly && (
+                                                    <button 
+                                                        onClick={() => removeListItem('projects', idx)}
+                                                        className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition"
+                                                    >
+                                                        <Trash2 className="w-5 h-5"/>
+                                                    </button>
+                                                )}
                                                 <div className="grid grid-cols-1 gap-6">
                                                     <div>
                                                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Project Name</label>
@@ -523,6 +552,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={proj.name}
                                                             onChange={(e) => updateNestedItem('projects', idx, 'name', e.target.value)}
+                                                            disabled={isReadOnly}
                                                         />
                                                     </div>
                                                     <div>
@@ -532,6 +562,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={proj.link}
                                                             onChange={(e) => updateNestedItem('projects', idx, 'link', e.target.value)}
+                                                            disabled={isReadOnly}
                                                         />
                                                     </div>
                                                     <div>
@@ -541,6 +572,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={proj.description}
                                                             onChange={(e) => updateNestedItem('projects', idx, 'description', e.target.value)}
+                                                            disabled={isReadOnly}
                                                         ></textarea>
                                                     </div>
                                                 </div>
@@ -555,22 +587,26 @@ const Profile = () => {
                                         <div className="flex items-center gap-2">
                                             <GraduationCap className="text-primary w-5 h-5"/> Education
                                         </div>
-                                        <button 
-                                            onClick={() => addListItem('education', { institution: '', degree: '', year: '' })}
-                                            className="btn-outline !py-2 !px-4 text-xs flex items-center gap-2"
-                                        >
-                                            <Plus className="w-4 h-4"/> Add History
-                                        </button>
+                                        {!isReadOnly && (
+                                            <button 
+                                                onClick={() => addListItem('education', { institution: '', degree: '', year: '' })}
+                                                className="btn-outline !py-2 !px-4 text-xs flex items-center gap-2"
+                                            >
+                                                <Plus className="w-4 h-4"/> Add History
+                                            </button>
+                                        )}
                                     </h3>
                                     <div className="space-y-6">
                                         {formData.education.map((edu, idx) => (
                                             <div key={idx} className="p-6 border border-gray-100 rounded-2xl bg-gray-50/20 relative group">
-                                                <button 
-                                                    onClick={() => removeListItem('education', idx)}
-                                                    className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition"
-                                                >
-                                                    <Trash2 className="w-5 h-5"/>
-                                                </button>
+                                                {!isReadOnly && (
+                                                    <button 
+                                                        onClick={() => removeListItem('education', idx)}
+                                                        className="absolute top-4 right-4 text-gray-300 hover:text-red-500 transition"
+                                                    >
+                                                        <Trash2 className="w-5 h-5"/>
+                                                    </button>
+                                                )}
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                     <div className="md:col-span-2">
                                                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Institution</label>
@@ -579,6 +615,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={edu.institution}
                                                             onChange={(e) => updateNestedItem('education', idx, 'institution', e.target.value)}
+                                                            disabled={isReadOnly}
                                                         />
                                                     </div>
                                                     <div>
@@ -588,6 +625,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={edu.degree}
                                                             onChange={(e) => updateNestedItem('education', idx, 'degree', e.target.value)}
+                                                            disabled={isReadOnly}
                                                         />
                                                     </div>
                                                     <div>
@@ -597,6 +635,7 @@ const Profile = () => {
                                                             className="input-field mt-1" 
                                                             value={edu.year}
                                                             onChange={(e) => updateNestedItem('education', idx, 'year', e.target.value)}
+                                                            disabled={isReadOnly}
                                                         />
                                                     </div>
                                                 </div>
