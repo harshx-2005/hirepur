@@ -143,7 +143,7 @@ const Dashboard = () => {
                                      <ActivityItem 
                                          key={app.id}
                                          user={app.applicant_name} 
-                                         action={app.status === 'applied' ? 'applied for' : `was ${app.status.replace('_', ' ')} for`} 
+                                         action={{ applied: 'applied for', under_review: 'is in review for', interview: 'is interviewing for', accepted: 'got an offer for', rejected: 'was declined for' }[app.status] || 'applied for'} 
                                          role={app.job_title} 
                                          time={new Date(app.applied_at).toLocaleDateString()} 
                                      />

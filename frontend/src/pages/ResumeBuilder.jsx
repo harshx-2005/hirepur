@@ -79,8 +79,8 @@ const ResumeBuilder = () => {
             <div className="max-w-5xl mx-auto">
                 <div className="flex justify-between items-center mb-12">
                     <div>
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tight">Resume <span className="text-primary">Architect</span></h1>
-                        <p className="text-gray-500 font-medium">Design your professional future with AI</p>
+                        <h1 className="text-4xl font-black text-gray-900 tracking-tight">Resume builder</h1>
+                        <p className="text-gray-500 font-medium">Fill in your details and we format a clean one-page resume.</p>
                     </div>
                     {step === 2 && (
                         <button 
@@ -263,7 +263,7 @@ const ResumeBuilder = () => {
                                                 <Bot className="w-8 h-8"/>
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-xl">AI Resume Architect</h4>
+                                                <h4 className="font-bold text-xl">Resume builder</h4>
                                                 <p className="text-primary-foreground/60 text-xs font-medium uppercase tracking-[0.1em]">Verified Resume Builder</p>
                                             </div>
                                         </div>

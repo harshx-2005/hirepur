@@ -53,7 +53,7 @@ const ApplicationReview = () => {
         switch(status) {
             case 'applied': return 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100/60';
             case 'under_review': return 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100/60';
-            case 'interview': return 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100/60';
+            case 'interview': return 'bg-metro-green/10 text-metro-green border-metro-green/30 hover:bg-metro-green/15';
             case 'accepted': return 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100/60';
             case 'rejected': return 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100/60';
             default: return 'bg-slate-50 text-slate-600 border-slate-200';

@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Briefcase, DollarSign, Calendar, ChevronLeft, Send, ShieldCheck, Zap, Star, Globe, Building2, UserCircle2, CheckCircle, UploadCloud, FileText, Loader2, XCircle, ArrowRight } from '../icons';
+import MetroLine from '../components/MetroLine';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -86,7 +87,8 @@ const JobDetails = () => {
         );
     };
 
-    const hasApplied = applicationsResponse?.data?.some(app => Number(app.job_id) === Number(id)) || appSuccess;
+    const myApplication = applicationsResponse?.data?.find(app => Number(app.job_id) === Number(id));
+    const hasApplied = !!myApplication || appSuccess;
 
     const applyMutation = useMutation({
         mutationFn: async () => {
@@ -191,7 +193,7 @@ const JobDetails = () => {
                                 <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{job.description}</p>
                                 
                                 <h3 className="text-xl font-black mt-12 mb-6 uppercase tracking-wider text-slate-400">Requirements</h3>
-                                <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{job.requirements || 'Standard high-performance requirements apply.'}</p>
+                                <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">{job.requirements || "The employer hasn't listed separate requirements — see the description above."}</p>
                             </div>
                         </motion.div>
                     </div>
@@ -202,20 +204,9 @@ const JobDetails = () => {
                             <motion.div 
                                 initial={{ opacity: 0, x: 20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="glass-card !p-8 border-2 border-primary/10 shadow-2xl shadow-primary/5"
+                                className="glass-card !p-8"
                             >
-                            <div className="mb-8">
-                                <div className="bg-primary/5 p-4 rounded-3xl flex items-center gap-4 mb-6">
-                                    <Zap className="text-primary w-8 h-8"/>
-                                    <div>
-                                        <h4 className="font-bold text-slate-900">AI Compatibility </h4>
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-primary">Matched: 92%</p>
-                                    </div>
-                                </div>
-                                <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                                    Based on the skills on your profile compared with this role's requirements.
-                                </p>
-                            </div>
+                            <span className="label-mono block mb-5">{hasApplied ? 'Your application' : 'Board this line'}</span>
 
                             <AnimatePresence mode="wait">
                                 {user && user.role !== 'job_seeker' ? (
@@ -229,16 +220,9 @@ const JobDetails = () => {
                                     </div>
                                 ) : hasApplied ? (
                                     <div className="space-y-4">
-                                        <motion.div 
-                                            key="success"
-                                            initial={{ opacity: 0, scale: 0.9 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            className="bg-green-500 text-white rounded-2xl p-6 text-center shadow-xl shadow-green-500/20"
-                                        >
-                                            <CheckCircle className="w-12 h-12 mx-auto mb-2"/>
-                                            <h4 className="font-black text-lg underline underline-offset-4 decoration-white/30 decoration-4">SUCCESS</h4>
-                                            <p className="text-xs font-bold uppercase tracking-widest mt-2">Application Transmitted</p>
-                                        </motion.div>
+                                        <div className="border border-ink/10 rounded-lg p-5 bg-surface">
+                                            <MetroLine status={myApplication?.status || 'applied'} />
+                                        </div>
                                         <Link to={`/chat?partnerId=${job.employer_user_id}`} className="w-full btn-outline block text-center !py-5 !text-slate-900 border-2 border-slate-100 hover:border-slate-900 !rounded-xl transition-all hover:shadow-lg">
                                             Message Recruiter
                                         </Link>
@@ -314,9 +298,6 @@ const JobDetails = () => {
                                 )}
                             </AnimatePresence>
 
-                            <div className="mt-8 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-300 justify-center">
-                                <ShieldCheck className="w-4 h-4"/> HirePur Verified Company
-                            </div>
                         </motion.div>
 
                             <div className="p-8 bg-slate-900 rounded-xl shadow-2xl shadow-slate-900/40 text-white relative overflow-hidden group">

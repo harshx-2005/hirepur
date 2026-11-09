@@ -45,7 +45,7 @@ const JDGenerator = () => {
                     <div className="glass-card">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 bg-primary text-white rounded-lg"><Sparkles className="w-5 h-5"/></div>
-                            <h2 className="text-xl font-bold">JD Gen</h2>
+                            <h2 className="text-xl font-bold">JD writer</h2>
                         </div>
                         
                         <div className="space-y-4">

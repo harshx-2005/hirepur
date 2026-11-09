@@ -254,10 +254,10 @@ const Profile = () => {
                         <div className="absolute top-6 right-6 z-10">
                             <button
                                 onClick={() => setIsEditMode(!isEditMode)}
-                                className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-300 shadow-lg ${
+                                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-300 ${
                                     isEditMode 
                                         ? 'bg-red-50 text-red-600 border-2 border-red-200 hover:bg-red-100' 
-                                        : 'bg-primary text-white hover:bg-primary/90 hover:scale-105'
+                                        : 'bg-ink text-paper hover:bg-primary'
                                 }`}
                             >
                                 {isEditMode ? (

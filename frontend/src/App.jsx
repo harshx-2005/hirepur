@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
 import { LogoMark } from './components/Logo';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -32,6 +32,13 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
 const queryClient = new QueryClient();
+
+// New page starts at the top (the router keeps the old scroll position otherwise).
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+};
 
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminDashboard from './pages/AdminDashboard';
@@ -75,6 +82,7 @@ const App = () => {
       <MotionConfig reducedMotion="user">
         <Router>
           <div className="flex flex-col min-h-screen bg-paper">
+            <ScrollToTop />
             <Navbar />
             <main className="flex-grow">
                 <AnimatePresence mode="wait">

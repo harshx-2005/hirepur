@@ -28,6 +28,17 @@
   --color-slate-800: #2a2926;
   --color-slate-900: #1a1918;
   --color-slate-950: #121212;
+  /* some pages use gray-*; keep them on the same warm scale */
+  --color-gray-50: #f6f4ee;
+  --color-gray-100: #edeae2;
+  --color-gray-200: #dedad0;
+  --color-gray-300: #c3beb2;
+  --color-gray-400: #9c978b;
+  --color-gray-500: #75716a;
+  --color-gray-600: #57544e;
+  --color-gray-700: #3f3d39;
+  --color-gray-800: #2a2926;
+  --color-gray-900: #1a1918;
 
   --font-sans: "Overpass", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Big Shoulders Display", "Overpass", sans-serif;
@@ -125,6 +136,11 @@
   .roll > span::after { content: attr(data-text); @apply absolute left-0 top-full; }
   .group:hover .roll > span, .roll:hover > span { transform: translateY(-100%); }
 }
+
+/* "Now boarding" ticker: content is rendered twice, so -50% loops seamlessly */
+.marquee { animation: marquee var(--marquee-d, 40s) linear infinite; }
+.marquee:hover { animation-play-state: paused; }
+@keyframes marquee { to { transform: translateX(-50%); } }
 
 .gradient-text {
   color: var(--color-primary);
