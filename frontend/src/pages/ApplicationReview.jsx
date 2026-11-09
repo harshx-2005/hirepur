@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, FileText, MessageSquare, AlertCircle, X } from 'lucide-react';
+import { User, Mail, FileText, MessageSquare, AlertCircle, X } from '../icons';
 
 const ApplicationReview = () => {
     const queryClient = useQueryClient();
@@ -61,7 +61,7 @@ const ApplicationReview = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white py-12 px-6 lg:px-12">
+        <div className="min-h-screen bg-paper py-12 px-6 lg:px-12">
             <div className="max-w-7xl mx-auto">
                 <div className="mb-12 flex flex-col md:flex-row justify-between items-end gap-6">
                     <div>
@@ -75,7 +75,7 @@ const ApplicationReview = () => {
                         {[1,2,3].map(i => <div key={i} className="glass-card h-32 animate-pulse"></div>)}
                     </div>
                 ) : applications.length === 0 ? (
-                    <div className="text-center py-32 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-100">
+                    <div className="text-center py-32 bg-slate-50 rounded-xl border-2 border-dashed border-slate-100">
                         <User className="w-20 h-20 text-slate-200 mx-auto mb-6"/>
                         <h3 className="text-2xl font-black text-slate-900">No applicants yet</h3>
                         <p className="text-slate-500 mt-2 font-medium">When candidates apply, they will appear in your pipeline.</p>
@@ -112,11 +112,11 @@ const ApplicationReview = () => {
                                                         onChange={(e) => statusMutation.mutate({ id: app.id, status: e.target.value })}
                                                         className={`appearance-none pl-3 pr-8 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border-2 cursor-pointer transition-all duration-200 focus:outline-none focus:ring-4 focus:ring-primary/10 ${getStatusStyles(app.status)}`}
                                                     >
-                                                        <option value="applied" className="bg-white text-slate-800 font-semibold normal-case">Applied</option>
-                                                        <option value="under_review" className="bg-white text-slate-800 font-semibold normal-case">Under Review</option>
-                                                        <option value="interview" className="bg-white text-slate-800 font-semibold normal-case">Shortlist</option>
-                                                        <option value="accepted" className="bg-white text-slate-800 font-semibold normal-case">Hire</option>
-                                                        <option value="rejected" className="bg-white text-slate-800 font-semibold normal-case">Reject</option>
+                                                        <option value="applied" className="bg-surface text-slate-800 font-semibold normal-case">Applied</option>
+                                                        <option value="under_review" className="bg-surface text-slate-800 font-semibold normal-case">Under Review</option>
+                                                        <option value="interview" className="bg-surface text-slate-800 font-semibold normal-case">Shortlist</option>
+                                                        <option value="accepted" className="bg-surface text-slate-800 font-semibold normal-case">Hire</option>
+                                                        <option value="rejected" className="bg-surface text-slate-800 font-semibold normal-case">Reject</option>
                                                     </select>
                                                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-500">
                                                         <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,7 +175,7 @@ const ApplicationReview = () => {
                                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                                className="bg-white rounded-[2.5rem] border border-slate-100 p-10 max-w-md w-full shadow-2xl relative overflow-hidden"
+                                className="bg-surface rounded-xl border border-slate-100 p-10 max-w-md w-full shadow-2xl relative overflow-hidden"
                             >
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full -mr-24 -mt-24 blur-2xl"></div>
                                 

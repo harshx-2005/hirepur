@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
-import { Briefcase, Users, Target, Rocket, CheckCircle2, Award, Zap, Heart } from 'lucide-react';
+import { Briefcase, Users, Target, Rocket, CheckCircle2, Award, Zap, Heart } from '../icons';
 
 const About = () => {
     const highlights = [
-        { label: 'AI Semantic Matching', value: '98%', description: 'Match accuracy for your dream role', icon: Zap, color: 'text-primary' },
+        { label: 'Job matching', value: '4 lines', description: 'Roles ranked against the skills on your profile', icon: Zap, color: 'text-primary' },
         { label: 'Direct Hiring', value: 'Live', description: 'Connect directly with top employers', icon: Briefcase, color: 'text-secondary' },
-        { label: 'Interview Coaching', value: '24/7', description: 'AI assistant ready to help', icon: Target, color: 'text-green-500' },
-        { label: 'Smart Tracking', value: 'Real-time', description: 'Live status of your applications', icon: Rocket, color: 'text-orange-500' },
+        { label: 'Interview Coaching', value: '24/7', description: 'Practice questions whenever you want', icon: Target, color: 'text-green-500' },
+        { label: 'Application tracking', value: '4 stops', description: 'See exactly where each application stands', icon: Rocket, color: 'text-orange-500' },
     ];
 
     const values = [
@@ -17,8 +17,8 @@ const About = () => {
             bg: "bg-red-50"
         },
         {
-            title: "Innovation First",
-            description: "Our AI-driven tools help candidates and employers bridge the gap with cutting-edge technology.",
+            title: "Useful tools",
+            description: "Resume, interview and job-description tools that save real time, and say plainly when AI wrote the draft.",
             icon: Zap,
             bg: "bg-yellow-50"
         },
@@ -31,7 +31,7 @@ const About = () => {
     ];
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-paper">
             {/* Hero Section */}
             <section className="relative py-24 px-6 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[120%] h-[500px] bg-slate-50 rounded-[100%] -mt-64 -z-10"></div>
@@ -48,8 +48,8 @@ const About = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 mb-8"
                     >
-                        Connecting Talent with <br />
-                        <span className="text-primary italic">Intelligence</span>
+                        The city <br />
+                        <span className="text-primary">of hiring.</span>
                     </motion.h1>
                     <motion.p 
                         initial={{ opacity: 0 }}
@@ -57,7 +57,7 @@ const About = () => {
                         transition={{ delay: 0.2 }}
                         className="text-xl text-slate-500 max-w-3xl mx-auto leading-relaxed"
                     >
-                        HirePur is India's leading AI-powered recruitment platform, designed specifically to solve the modern challenges of hiring. We empower candidates to build better careers and help companies find their perfect match.
+                        HirePur is a job board for India built like a transit map. Candidates pick a line, apply in a couple of clicks and always know which stop their application is at. Employers post roles and move people along the same line.
                     </motion.p>
                 </div>
             </section>
@@ -111,7 +111,7 @@ const About = () => {
                                 <motion.div 
                                     key={i}
                                     whileHover={{ x: 10 }}
-                                    className="p-8 bg-white rounded-3xl border border-slate-100 shadow-sm flex items-start gap-6"
+                                    className="p-8 bg-surface rounded-3xl border border-slate-100 shadow-sm flex items-start gap-6"
                                 >
                                     <div className={`p-4 ${v.bg} rounded-2xl`}>
                                         <v.icon className="w-6 h-6 text-slate-900" />
@@ -129,7 +129,7 @@ const About = () => {
 
             {/* CTA Section */}
             <section className="py-24 px-6">
-                <div className="max-w-4xl mx-auto glass-card !p-16 !rounded-[3rem] bg-slate-900 text-center relative overflow-hidden">
+                <div className="max-w-4xl mx-auto glass-card !p-16 !rounded-xl bg-slate-900 text-center relative overflow-hidden">
                     <div className="absolute top-0 left-0 w-64 h-64 bg-primary/20 rounded-full -ml-32 -mt-32 blur-3xl"></div>
                     <div className="relative z-10">
                         <h2 className="text-4xl md:text-5xl font-black tracking-tighter text-white mb-8">Ready to transform your <br />hiring experience?</h2>

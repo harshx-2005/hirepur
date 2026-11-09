@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { motion } from 'framer-motion';
-import { Briefcase, Loader2, ArrowRight, Mail, Key } from 'lucide-react';
+import { Briefcase, Loader2, ArrowRight, Mail, Key } from '../icons';
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Please enter a valid email address'),

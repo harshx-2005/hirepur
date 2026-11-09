@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion } from 'framer-motion';
-import { Zap, Briefcase, Star, TrendingUp, CheckCircle, Search } from 'lucide-react';
+import { Zap, Briefcase, Star, TrendingUp, CheckCircle, Search } from '../icons';
 import { Link } from 'react-router-dom';
 
 const JobMatch = () => {
@@ -22,13 +22,13 @@ const JobMatch = () => {
                     <motion.div 
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full font-bold text-sm mb-4"
+                        className="inline-flex items-center gap-2 label-mono mb-4"
                     >
-                        <Zap className="w-4 h-4 fill-primary"/> AI Semantic Engine Active
+                        Job match
                     </motion.div>
-                    <h1 className="text-4xl font-bold text-gray-900">Your Identity Matches</h1>
+                    <h1 className="text-4xl font-bold text-gray-900">Roles that fit you</h1>
                     <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-                        We've analyzed your profile and semantic skills to find roles that perfectly align with your career trajectory.
+                        Open roles ranked by how well they match the skills and experience on your profile.
                     </p>
                 </div>
 
@@ -39,7 +39,7 @@ const JobMatch = () => {
                         ))}
                     </div>
                 ) : matches.length === 0 ? (
-                    <div className="text-center py-24 bg-white rounded-3xl border border-dashed border-gray-200">
+                    <div className="text-center py-24 bg-surface rounded-3xl border border-dashed border-gray-200">
                          <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                              <Search className="w-10 h-10 text-gray-200" />
                          </div>
@@ -62,7 +62,7 @@ const JobMatch = () => {
                                 </div>
                                 
                                 <div className="flex items-center gap-4 mb-6 pt-4">
-                                    <div className="w-12 h-12 bg-white rounded-xl shadow-sm border border-gray-100 flex items-center justify-center p-2">
+                                    <div className="w-12 h-12 bg-surface rounded-xl shadow-sm border border-gray-100 flex items-center justify-center p-2">
                                         <Briefcase className="text-primary w-6 h-6"/>
                                     </div>
                                     <div>

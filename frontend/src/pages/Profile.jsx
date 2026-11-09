@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useProfileStore } from '../store/useProfileStore';
-import { User, Mail, MapPin, Linkedin, Globe, Save, RefreshCw, Briefcase, GraduationCap, Plus, Trash2, Zap, Camera, Pencil, X, FileText, Upload, Download, CheckCircle } from 'lucide-react';
+import { User, Mail, MapPin, Linkedin, Globe, Save, RefreshCw, Briefcase, GraduationCap, Plus, Trash2, Zap, Camera, Pencil, X, FileText, Upload, Download, CheckCircle } from '../icons';
 import { useAuthStore } from '../store/useAuthStore';
 import { useSearchParams } from 'react-router-dom';
 import apiClient from '../api/client';
@@ -217,8 +217,8 @@ const Profile = () => {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
                     
                     <div className="relative group">
-                        <div className="w-32 h-32 rounded-[2.5rem] bg-gradient-to-tr from-primary to-secondary p-1 overflow-hidden">
-                            <div className="w-full h-full rounded-[2.3rem] bg-white flex items-center justify-center overflow-hidden">
+                        <div className="w-32 h-32 rounded-xl bg-ink p-1 overflow-hidden">
+                            <div className="w-full h-full rounded-xl bg-surface flex items-center justify-center overflow-hidden">
                                 {displayPic ? (
                                     <img src={displayPic} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (
@@ -493,7 +493,7 @@ const Profile = () => {
                                     <div>
                                         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Company Size</label>
                                         <select 
-                                            className="input-field mt-1 bg-white"
+                                            className="input-field mt-1 bg-surface"
                                             value={formData.company_size}
                                             onChange={(e) => setFormData({...formData, company_size: e.target.value})}
                                             disabled={fieldsDisabled}
@@ -595,7 +595,7 @@ const Profile = () => {
                                     
                                     {isFresher && user?.role === 'job_seeker' && formData.experience.length === 0 ? (
                                         <div className="p-8 border-2 border-dashed border-gray-100 rounded-3xl text-center bg-gray-50/50">
-                                            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="inline-block p-4 bg-white rounded-2xl shadow-sm mb-4">
+                                            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="inline-block p-4 bg-surface rounded-2xl shadow-sm mb-4">
                                                 🎓
                                             </motion.div>
                                             <h4 className="font-bold text-gray-900">Career Kickstart</h4>
@@ -609,7 +609,7 @@ const Profile = () => {
                                                 <div key={idx} className="p-6 border border-gray-100 rounded-2xl bg-gray-50/20 relative group">
                                                     <div className="absolute top-4 right-4 flex items-center gap-2">
                                                         <select 
-                                                            className="bg-white border border-gray-200 rounded-lg px-2 py-1 text-[10px] font-bold uppercase text-gray-400 outline-none"
+                                                            className="bg-surface border border-gray-200 rounded-lg px-2 py-1 text-[10px] font-bold uppercase text-gray-400 outline-none"
                                                             value={exp.type || 'Job'}
                                                             onChange={(e) => updateNestedItem('experience', idx, 'type', e.target.value)}
                                                             disabled={fieldsDisabled}

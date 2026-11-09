@@ -1,70 +1,57 @@
 import { Link } from 'react-router-dom';
-import { Briefcase, Github, Twitter, Linkedin, Mail } from 'lucide-react';
+import { Github, Linkedin, Mail } from '../icons';
+import Logo from './Logo';
 
-const Footer = () => {
-    return (
-        <footer className="bg-white border-t border-slate-100 mt-auto">
-            <div className="max-w-7xl mx-auto py-20 px-6 lg:px-12">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-16">
-                    <div className="col-span-1 md:col-span-1 space-y-6">
-                        <Link to="/" className="flex items-center gap-2 text-2xl font-black text-slate-900 tracking-tighter">
-                            <div className="bg-primary p-1.5 rounded-xl shadow-lg shadow-primary/20">
-                                <Briefcase className="w-6 h-6 text-white" />
-                            </div>
-                            HirePur
-                        </Link>
-                        <p className="text-slate-400 text-sm font-medium leading-relaxed">
-                            The intelligent bridge between ambitious talent and visionary companies. Powered by HirePur AI.
-                        </p>
-                        <div className="flex items-center gap-4 text-slate-300">
-                             <a href="#" className="hover:text-primary transition-colors"><Twitter className="w-5 h-5"/></a>
-                             <a href="#" className="hover:text-primary transition-colors"><Github className="w-5 h-5"/></a>
-                             <a href="#" className="hover:text-primary transition-colors"><Linkedin className="w-5 h-5"/></a>
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <h3 className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase mb-8">Candidates</h3>
-                        <ul className="space-y-4">
-                            <li><Link to="/jobs" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors">Find Opportunities</Link></li>
-                            <li><Link to="/resume-builder" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors">AI Resume Builder</Link></li>
-                            <li><Link to="/interview-coach" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors">Interview Coach</Link></li>
-                        </ul>
-                    </div>
-                    
-                    <div>
-                        <h3 className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase mb-8">Employers</h3>
-                        <ul className="space-y-4">
-                            <li><Link to="/register" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors">Post a Role</Link></li>
-                            <li><Link to="/jd-generator" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors">JD Generator</Link></li>
-                            <li><Link to="/applications/review" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors">Candidate Review</Link></li>
-                        </ul>
-                    </div>
-                    
-                    <div>
-                        <h3 className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase mb-8">Support</h3>
-                        <ul className="space-y-4">
-                            <li><Link to="/about" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors">Company Story</Link></li>
-                            <li><Link to="/contact" className="text-sm font-bold text-slate-600 hover:text-primary transition-colors">Get Assistance</Link></li>
-                            <li className="flex items-center gap-2 text-sm font-bold text-slate-600">
-                                <Mail className="w-4 h-4 text-slate-300"/> support@hirepur.com
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div className="mt-20 pt-8 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-xs font-black text-slate-300 uppercase tracking-widest">
-                        &copy; 2026 HirePur Intelligence Inc. Built for Excellence.
+const columns = [
+    { line: 'L1', color: 'bg-metro-blue', title: 'Candidates', links: [['/jobs', 'Find a job'], ['/resume-builder', 'Resume builder'], ['/resume-analyzer', 'Resume check'], ['/interview-coach', 'Interview practice']] },
+    { line: 'L2', color: 'bg-metro-red', title: 'Employers', links: [['/register', 'Post a role'], ['/jd-generator', 'Job description writer'], ['/applications/review', 'Review applicants']] },
+    { line: 'L3', color: 'bg-metro-green', title: 'HirePur', links: [['/about', 'About'], ['/privacy', 'Privacy'], ['/terms', 'Terms']] },
+];
+
+const Footer = () => (
+    <footer className="bg-ink text-paper mt-auto">
+        {/* the four lines leaving the station */}
+        <div className="grid grid-rows-4 h-3">
+            <span className="bg-metro-blue" /><span className="bg-metro-red" /><span className="bg-metro-green" /><span className="bg-metro-yellow" />
+        </div>
+        <div className="max-w-7xl mx-auto px-5 md:px-10 pt-16 pb-10">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+                <div className="md:col-span-5 space-y-5">
+                    <Logo inverted />
+                    <p className="text-paper/60 text-sm leading-relaxed max-w-xs">
+                        A job board built like a transit map: pick a line, board, and see exactly which stop your application is at.
                     </p>
-                    <div className="flex gap-8 text-[10px] font-black text-slate-300 uppercase tracking-widest">
-                        <Link to="/privacy" className="hover:text-slate-500">Privacy Policy</Link>
-                        <Link to="/terms" className="hover:text-slate-500">Terms of Service</Link>
+                    <a href="mailto:support@hirepur.com" className="inline-flex items-center gap-2 text-sm text-paper/80 hover:text-paper">
+                        <Mail className="w-4 h-4" /> support@hirepur.com
+                    </a>
+                </div>
+
+                {columns.map(col => (
+                    <div key={col.title} className="md:col-span-2">
+                        <div className="flex items-center gap-2 mb-5">
+                            <span className={`${col.color} w-6 h-6 rounded-full flex items-center justify-center font-mono text-[10px] font-semibold text-white`}>{col.line}</span>
+                            <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-paper/60">{col.title}</span>
+                        </div>
+                        <ul className="space-y-3 border-l border-paper/15 pl-4">
+                            {col.links.map(([to, label]) => (
+                                <li key={to}><Link to={to} className="text-sm text-paper/85 hover:text-paper">{label}</Link></li>
+                            ))}
+                        </ul>
                     </div>
+                ))}
+            </div>
+
+            <div className="mt-16 pt-6 border-t border-paper/15 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-paper/50">
+                    &copy; {new Date().getFullYear()} HirePur · Made in Pune
+                </p>
+                <div className="flex items-center gap-4 text-paper/60">
+                    <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub" className="hover:text-paper"><Github className="w-5 h-5" /></a>
+                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn" className="hover:text-paper"><Linkedin className="w-5 h-5" /></a>
                 </div>
             </div>
-        </footer>
-    );
-};
+        </div>
+    </footer>
+);
 
 export default Footer;

@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     MessageSquare, Send, User, Search, MoreVertical, 
     Paperclip, ArrowLeft, Check, CheckCheck, Loader2, Sparkles, ShieldAlert 
-} from 'lucide-react';
+} from '../icons';
 
 const Chat = () => {
     const { user, token } = useAuthStore();
@@ -119,13 +119,13 @@ const Chat = () => {
 
     return (
         <div className="min-h-screen bg-slate-50/50 flex items-center justify-center p-4">
-            <div className="max-w-6xl w-full h-[85vh] bg-white rounded-3xl shadow-xl shadow-slate-100/50 border border-slate-100 flex overflow-hidden">
+            <div className="max-w-6xl w-full h-[85vh] bg-surface rounded-3xl shadow-xl shadow-slate-100/50 border border-slate-100 flex overflow-hidden">
                 
                 {/* 1. Conversations Sidebar Pane */}
                 <div className={`w-full md:w-80 border-r border-slate-100 flex flex-col bg-slate-50/20 ${
                     mobileView === 'chat' ? 'hidden md:flex' : 'flex'
                 }`}>
-                    <div className="p-6 border-b border-slate-100 bg-white">
+                    <div className="p-6 border-b border-slate-100 bg-surface">
                         <div className="flex justify-between items-center mb-4">
                             <h2 className="text-2xl font-black text-slate-900 tracking-tight">Chats</h2>
                             <span className="badge bg-primary/10 text-primary font-black uppercase text-[9px] tracking-wider flex items-center gap-1">
@@ -137,7 +137,7 @@ const Chat = () => {
                             <input 
                                 type="text" 
                                 placeholder="Search connections..." 
-                                className="w-full pl-11 pr-4 py-3 bg-slate-100 border border-transparent rounded-2xl text-xs font-bold text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-primary/20 transition-all focus:ring-4 focus:ring-primary/5"
+                                className="w-full pl-11 pr-4 py-3 bg-slate-100 border border-transparent rounded-2xl text-xs font-bold text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-surface focus:border-primary/20 transition-all focus:ring-4 focus:ring-primary/5"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -148,7 +148,7 @@ const Chat = () => {
                         {loadingConvs ? (
                              <div className="space-y-3">
                                  {[1,2,3,4].map(i => (
-                                     <div key={i} className="h-16 bg-white border border-slate-50 animate-pulse rounded-2xl flex items-center gap-3 p-3">
+                                     <div key={i} className="h-16 bg-surface border border-slate-50 animate-pulse rounded-2xl flex items-center gap-3 p-3">
                                          <div className="w-10 h-10 rounded-full bg-slate-200"></div>
                                          <div className="flex-1 space-y-2">
                                              <div className="h-3 bg-slate-200 rounded w-1/2"></div>
@@ -172,8 +172,8 @@ const Chat = () => {
                                         onClick={() => handleSelectChat(conv)}
                                         className={`w-full p-4 rounded-2xl flex items-center gap-4 border transition-all ${
                                             isActive 
-                                                ? 'bg-white border-slate-100 shadow-md shadow-slate-100/30 font-black' 
-                                                : 'border-transparent hover:bg-white hover:border-slate-50'
+                                                ? 'bg-surface border-slate-100 shadow-md shadow-slate-100/30 font-black' 
+                                                : 'border-transparent hover:bg-surface hover:border-slate-50'
                                         }`}
                                     >
                                         <div className="relative flex-shrink-0">
@@ -222,7 +222,7 @@ const Chat = () => {
                     {activePartner ? (
                         <>
                             {/* Active Chat Top Bar */}
-                            <div className="p-4 border-b border-slate-100 flex justify-between items-center px-6 shadow-sm bg-white">
+                            <div className="p-4 border-b border-slate-100 flex justify-between items-center px-6 shadow-sm bg-surface">
                                 <div className="flex items-center gap-4 min-w-0">
                                     <button 
                                         onClick={handleBackToList}
@@ -261,7 +261,7 @@ const Chat = () => {
                             {/* Active Chat Content Body or Gated Warning */}
                             {activePartnerError ? (
                                 <div className="flex-grow flex flex-col items-center justify-center p-12 text-center bg-slate-50/20">
-                                    <div className="w-20 h-20 bg-red-500/10 rounded-[2rem] flex items-center justify-center mb-6">
+                                    <div className="w-20 h-20 bg-red-500/10 rounded-xl flex items-center justify-center mb-6">
                                         <ShieldAlert className="w-8 h-8 text-red-500"/>
                                     </div>
                                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">Security Gated Conversation</h3>
@@ -296,7 +296,7 @@ const Chat = () => {
                                                             <div className={`max-w-[70%] p-4 rounded-2xl text-xs font-semibold shadow-sm border transition-all ${
                                                                 isMe 
                                                                     ? 'bg-slate-900 text-white border-transparent rounded-tr-none' 
-                                                                    : 'bg-white text-slate-800 border-slate-100 rounded-tl-none'
+                                                                    : 'bg-surface text-slate-800 border-slate-100 rounded-tl-none'
                                                             }`}>
                                                                 <p className="leading-relaxed whitespace-pre-wrap">{msg.message}</p>
                                                                 <div className="flex justify-end items-center gap-1 mt-1.5 opacity-65">
@@ -339,13 +339,13 @@ const Chat = () => {
                                     </div>
 
                                     {/* Message Composer Footer */}
-                                    <div className="p-6 bg-white border-t border-slate-100">
+                                    <div className="p-6 bg-surface border-t border-slate-100">
                                         <div className="relative flex gap-3 items-center">
                                             <button className="text-slate-400 hover:text-primary transition p-2"><Paperclip className="w-5 h-5"/></button>
                                             <input 
                                                 type="text" 
                                                 placeholder="Write a message..." 
-                                                className="w-full pl-5 pr-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-primary/20 transition-all focus:ring-4 focus:ring-primary/5" 
+                                                className="w-full pl-5 pr-5 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-700 placeholder-slate-400 focus:outline-none focus:bg-surface focus:border-primary/20 transition-all focus:ring-4 focus:ring-primary/5" 
                                                 value={input}
                                                 onChange={handleInputChange}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -364,7 +364,7 @@ const Chat = () => {
                         </>
                     ) : (
                         <div className="flex-grow flex flex-col items-center justify-center text-center p-12 bg-slate-50/10">
-                            <div className="w-24 h-24 bg-primary/5 rounded-[2rem] flex items-center justify-center mb-6">
+                            <div className="w-24 h-24 bg-primary/5 rounded-xl flex items-center justify-center mb-6">
                                 <MessageSquare className="w-10 h-10 text-primary opacity-25"/>
                             </div>
                             <h3 className="text-2xl font-black text-slate-900 tracking-tight">Select connection to chat</h3>

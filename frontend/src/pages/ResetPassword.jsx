@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { motion } from 'framer-motion';
-import { Briefcase, Loader2, ArrowRight, Lock, ShieldAlert } from 'lucide-react';
+import { Briefcase, Loader2, ArrowRight, Lock, ShieldAlert } from '../icons';
 
 // Strict Password Validation Rules
 const newPasswordSchema = z.object({

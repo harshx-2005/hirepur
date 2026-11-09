@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 const TermsOfService = () => {
     return (
-        <div className="min-h-screen bg-white py-20 px-6 lg:px-12">
+        <div className="min-h-screen bg-paper py-20 px-6 lg:px-12">
             <div className="max-w-4xl mx-auto">
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}

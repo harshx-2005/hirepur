@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, User, Send, RefreshCw, Zap, Award, BookOpen, MessageSquare } from 'lucide-react';
+import { Bot, User, Send, RefreshCw, Zap, Award, BookOpen, MessageSquare } from '../icons';
 
 const InterviewCoach = () => {
     const [messages, setMessages] = useState([
@@ -39,7 +39,7 @@ const InterviewCoach = () => {
     return (
         <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto h-[80vh] flex flex-col">
-                <div className="bg-white border border-gray-200 rounded-t-2xl p-6 flex justify-between items-center shadow-sm">
+                <div className="bg-surface border border-gray-200 rounded-t-2xl p-6 flex justify-between items-center shadow-sm">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-primary/10 text-primary rounded-xl">
                             <Bot className="w-6 h-6"/>
@@ -47,7 +47,7 @@ const InterviewCoach = () => {
                         <div>
                             <h2 className="text-xl font-bold text-gray-900">AI Mock Interview</h2>
                             <p className="text-sm text-gray-500 flex items-center gap-1">
-                                <Zap className="w-3 h-3 text-secondary fill-secondary"/> Powered by HirePur Intelligence
+                                <span className="label-mono">AI interviewer · practice mode</span>
                             </p>
                         </div>
                     </div>
@@ -64,7 +64,7 @@ const InterviewCoach = () => {
 
                 <div 
                     ref={scrollRef}
-                    className="flex-grow bg-white border-x border-gray-200 overflow-y-auto p-6 space-y-6 scroll-smooth"
+                    className="flex-grow bg-surface border-x border-gray-200 overflow-y-auto p-6 space-y-6 scroll-smooth"
                 >
                     {messages.map((msg, idx) => (
                         <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -98,7 +98,7 @@ const InterviewCoach = () => {
                     )}
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-b-2xl p-4 shadow-sm">
+                <div className="bg-surface border border-gray-200 rounded-b-2xl p-4 shadow-sm">
                     <div className="relative flex gap-4">
                         <input 
                             type="text" 

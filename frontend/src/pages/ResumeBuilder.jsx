@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Download, UserCheck, Bot, Zap, RefreshCw, Briefcase, GraduationCap, Plus, Trash2, Globe, Linkedin } from 'lucide-react';
+import { FileText, Download, UserCheck, Bot, Zap, RefreshCw, Briefcase, GraduationCap, Plus, Trash2, Globe, Linkedin } from '../icons';
 import { useProfileStore } from '../store/useProfileStore';
 import { useAIStore } from '../store/useAIStore';
 import { useAuthStore } from '../store/useAuthStore';
@@ -118,7 +118,7 @@ const ResumeBuilder = () => {
                                             onClick={() => setFormData({...formData, isFresher: !formData.isFresher})}
                                             className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${formData.isFresher ? 'bg-primary' : 'bg-gray-300'}`}
                                         >
-                                            <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 ${formData.isFresher ? 'translate-x-6' : ''}`}></div>
+                                            <div className={`absolute top-1 left-1 w-4 h-4 bg-surface rounded-full transition-transform duration-300 ${formData.isFresher ? 'translate-x-6' : ''}`}></div>
                                         </button>
                                     </div>
 
@@ -273,7 +273,7 @@ const ResumeBuilder = () => {
                                         <button 
                                             onClick={handleGenerate}
                                             disabled={builderMutation.isPending}
-                                            className="w-full bg-white text-primary font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl disabled:opacity-50"
+                                            className="w-full bg-surface text-primary font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl disabled:opacity-50"
                                         >
                                             {builderMutation.isPending ? <RefreshCw className="animate-spin w-6 h-6"/> : <Zap className="w-6 h-6"/>}
                                             {builderMutation.isPending ? 'Crafting your resume...' : 'Generate AI Professional CV'}
@@ -319,7 +319,7 @@ const ResumeBuilder = () => {
                                     </button>
                                 </div>
                             </div>
-                            <div className="p-12 bg-white min-h-[800px] shadow-inner font-serif">
+                            <div className="p-12 bg-surface min-h-[800px] shadow-inner font-serif">
                                 <div className="max-w-3xl mx-auto">
                                     <div className="prose max-w-none prose-slate">
                                         <ReactMarkdown>{generatedResume}</ReactMarkdown>

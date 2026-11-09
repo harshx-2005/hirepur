@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion } from 'framer-motion';
-import { Briefcase, MapPin, IndianRupee, Clock, Layout, Save, Trash2, Plus, Sparkles } from 'lucide-react';
+import { Briefcase, MapPin, IndianRupee, Clock, Layout, Save, Trash2, Plus, Sparkles } from '../icons';
 
 const PostJob = () => {
     const { id } = useParams();
@@ -79,7 +79,7 @@ const PostJob = () => {
     if (isEdit && isJobLoading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
 
     return (
-        <div className="min-h-screen bg-white py-12 px-6 lg:px-12">
+        <div className="min-h-screen bg-paper py-12 px-6 lg:px-12">
             <div className="max-w-4xl mx-auto">
                 <motion.div 
                     initial={{ opacity: 0, y: -20 }}

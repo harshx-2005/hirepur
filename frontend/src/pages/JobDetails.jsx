@@ -2,7 +2,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Briefcase, DollarSign, Calendar, ChevronLeft, Send, ShieldCheck, Zap, Star, Globe, Building2, UserCircle2, CheckCircle, UploadCloud, FileText, Loader2, XCircle, ArrowRight } from 'lucide-react';
+import { MapPin, Briefcase, DollarSign, Calendar, ChevronLeft, Send, ShieldCheck, Zap, Star, Globe, Building2, UserCircle2, CheckCircle, UploadCloud, FileText, Loader2, XCircle, ArrowRight } from '../icons';
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/useAuthStore';
 
@@ -126,7 +126,7 @@ const JobDetails = () => {
     const job = jobResponse?.data;
 
     if (isLoading) return (
-        <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="min-h-screen flex items-center justify-center bg-surface">
             <div className="animate-pulse flex flex-col items-center gap-4">
                 <div className="bg-slate-100 w-20 h-20 rounded-3xl"></div>
                 <div className="h-4 bg-slate-100 w-32 rounded-full"></div>
@@ -154,7 +154,7 @@ const JobDetails = () => {
                         >
                             <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-12">
                                 <div className="flex items-center gap-6">
-                                    <div className="w-20 h-20 bg-slate-50 rounded-[2rem] border border-slate-100 flex items-center justify-center font-black text-3xl text-slate-300">
+                                    <div className="w-20 h-20 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-center font-black text-3xl text-slate-300">
                                         {job.company_name?.[0]}
                                     </div>
                                     <div>
@@ -170,16 +170,16 @@ const JobDetails = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3">
-                                    <button className="p-4 bg-white border border-slate-100 rounded-2xl hover:bg-slate-50 transition-colors">
+                                    <button className="p-4 bg-surface border border-slate-100 rounded-2xl hover:bg-slate-50 transition-colors">
                                         <Star className="w-6 h-6 text-slate-200"/>
                                     </button>
-                                    <button className="p-4 bg-white border border-slate-100 rounded-2xl hover:bg-slate-50 transition-colors">
+                                    <button className="p-4 bg-surface border border-slate-100 rounded-2xl hover:bg-slate-50 transition-colors">
                                         <Globe className="w-6 h-6 text-slate-200"/>
                                     </button>
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-8 bg-slate-50 rounded-[2rem] mb-12">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-8 bg-slate-50 rounded-xl mb-12">
                                 <DetailBox icon={<Briefcase/>} label="Job Type" value={job.job_type || 'Full-time'} />
                                 <DetailBox icon={<Calendar/>} label="Posted" value={new Date(job.created_at).toLocaleDateString()} />
                                 <DetailBox icon={<DollarSign/>} label="Salary" value={job.salary_range || 'Competitive'} />
@@ -213,7 +213,7 @@ const JobDetails = () => {
                                     </div>
                                 </div>
                                 <p className="text-xs text-slate-500 leading-relaxed font-medium">
-                                    Our semantic matching indicates you are a high-tier candidate for this specific role. 
+                                    Based on the skills on your profile compared with this role's requirements.
                                 </p>
                             </div>
 
@@ -223,7 +223,7 @@ const JobDetails = () => {
                                         <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 text-center">
                                             <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Recruiter Mode</p>
                                         </div>
-                                        <Link to={`/chat?partnerId=${job.employer_user_id}`} className="w-full btn-outline block text-center !py-5 !text-slate-900 border-2 border-slate-100 hover:border-slate-900 !rounded-[2rem] transition-all hover:shadow-lg">
+                                        <Link to={`/chat?partnerId=${job.employer_user_id}`} className="w-full btn-outline block text-center !py-5 !text-slate-900 border-2 border-slate-100 hover:border-slate-900 !rounded-xl transition-all hover:shadow-lg">
                                             Message Recruiter
                                         </Link>
                                     </div>
@@ -239,7 +239,7 @@ const JobDetails = () => {
                                             <h4 className="font-black text-lg underline underline-offset-4 decoration-white/30 decoration-4">SUCCESS</h4>
                                             <p className="text-xs font-bold uppercase tracking-widest mt-2">Application Transmitted</p>
                                         </motion.div>
-                                        <Link to={`/chat?partnerId=${job.employer_user_id}`} className="w-full btn-outline block text-center !py-5 !text-slate-900 border-2 border-slate-100 hover:border-slate-900 !rounded-[2rem] transition-all hover:shadow-lg">
+                                        <Link to={`/chat?partnerId=${job.employer_user_id}`} className="w-full btn-outline block text-center !py-5 !text-slate-900 border-2 border-slate-100 hover:border-slate-900 !rounded-xl transition-all hover:shadow-lg">
                                             Message Recruiter
                                         </Link>
                                     </div>
@@ -248,7 +248,7 @@ const JobDetails = () => {
                                         key="incomplete-profile"
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
-                                        className="bg-amber-500/10 border-2 border-amber-500/20 rounded-[2.5rem] p-8 text-center"
+                                        className="bg-amber-500/10 border-2 border-amber-500/20 rounded-xl p-8 text-center"
                                     >
                                         <XCircle className="w-12 h-12 mx-auto mb-4 text-amber-500"/>
                                         <h4 className="font-black text-base uppercase tracking-wider text-amber-900 mb-2">Setup Incomplete</h4>
@@ -307,7 +307,7 @@ const JobDetails = () => {
                                         >
                                             {applyMutation.isPending ? 'Syncing...' : 'Instantly Apply'}
                                         </button>
-                                        <Link to={`/chat?partnerId=${job.employer_user_id}`} className="w-full btn-outline block text-center !py-5 !text-slate-900 border-2 border-slate-100 hover:border-slate-900 !rounded-[2rem] transition-all hover:shadow-lg">
+                                        <Link to={`/chat?partnerId=${job.employer_user_id}`} className="w-full btn-outline block text-center !py-5 !text-slate-900 border-2 border-slate-100 hover:border-slate-900 !rounded-xl transition-all hover:shadow-lg">
                                             Message Recruiter
                                         </Link>
                                     </motion.div>
@@ -319,11 +319,10 @@ const JobDetails = () => {
                             </div>
                         </motion.div>
 
-                            <div className="p-8 bg-slate-900 rounded-[2.5rem] shadow-2xl shadow-slate-900/40 text-white relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-secondary/20 blur-[80px] rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                            <div className="p-8 bg-slate-900 rounded-xl shadow-2xl shadow-slate-900/40 text-white relative overflow-hidden group">
                                 <h4 className="text-xl font-black mb-4 relative z-10 uppercase tracking-tighter">Need a <br/> Tailored CV?</h4>
                                 <p className="text-white/50 text-xs mb-8 leading-relaxed font-bold relative z-10">Use our AI Agent to rewrite your resume specifically for this {job.title} role.</p>
-                                <Link to="/resume-builder" className="inline-flex items-center gap-2 bg-white text-slate-900 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition active:scale-95 shadow-xl relative z-10">
+                                <Link to="/resume-builder" className="inline-flex items-center gap-2 bg-surface text-slate-900 px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 transition active:scale-95 shadow-xl relative z-10">
                                     Optimize Resume <Zap className="w-4 h-4 text-primary"/>
                                 </Link>
                             </div>
@@ -338,7 +337,7 @@ const JobDetails = () => {
 
 const DetailBox = ({ icon, label, value }) => (
     <div className="flex flex-col items-center text-center">
-        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-slate-400 mb-2 shadow-sm border border-slate-100">
+        <div className="w-8 h-8 rounded-full bg-surface flex items-center justify-center text-slate-400 mb-2 shadow-sm border border-slate-100">
             {icon}
         </div>
         <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">{label}</p>

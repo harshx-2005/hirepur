@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Wand2, Copy, Check, RefreshCw, FileText, Sparkles, Layout } from 'lucide-react';
+import { Wand2, Copy, Check, RefreshCw, FileText, Sparkles, Layout } from '../icons';
 import ReactMarkdown from 'react-markdown';
 
 const JDGenerator = () => {
@@ -106,7 +106,7 @@ const JDGenerator = () => {
                     <div className="glass-card min-h-[600px] flex flex-col relative">
                         <div className="absolute top-6 right-6 flex gap-2">
                              {generatedJD && (
-                                 <button onClick={handleCopy} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition border border-gray-100 bg-white">
+                                 <button onClick={handleCopy} className="p-2 hover:bg-gray-100 rounded-lg text-gray-500 transition border border-gray-100 bg-surface">
                                      {copied ? <Check className="w-5 h-5 text-green-500"/> : <Copy className="w-5 h-5"/>}
                                  </button>
                              )}
@@ -135,7 +135,7 @@ const JDGenerator = () => {
                                     className="flex-grow flex flex-col items-center justify-center text-center opacity-30 select-none"
                                 >
                                     <Sparkles className="w-16 h-16 mb-4"/>
-                                    <p className="text-xl font-medium italic">Generating magic will appear here...</p>
+                                    <p className="text-xl font-medium italic">Your draft will appear here.</p>
                                 </motion.div>
                             )}
                         </AnimatePresence>

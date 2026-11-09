@@ -1,18 +1,21 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import { useNotificationStore } from '../store/useNotificationStore';
-import { Briefcase, LogOut, User, Menu, Bell, Sparkles } from 'lucide-react';
+import { LogOut, User, Menu, Bell, X } from '../icons';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Logo from './Logo';
+
+const navClass = ({ isActive }) => `nav-link ${isActive ? '!text-ink after:!w-full' : ''}`;
 
 const Navbar = () => {
   const { isAuthenticated, user, logout } = useAuthStore();
-  const { 
-    notifications, 
-    unreadCount, 
-    fetchNotifications, 
-    markAsRead, 
-    markAllAsRead 
+  const {
+    notifications,
+    unreadCount,
+    fetchNotifications,
+    markAsRead,
+    markAllAsRead
   } = useNotificationStore();
 
   const navigate = useNavigate();
@@ -48,34 +51,31 @@ const Navbar = () => {
     navigate('/');
   };
 
+  const close = () => setIsOpen(false);
+
   return (
-    <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100 py-5 px-6 md:px-12 flex items-center justify-between">
-      <Link to="/" className="flex items-center gap-2 text-2xl font-black tracking-tighter text-slate-900 group">
-        <div className="bg-primary p-1.5 rounded-xl group-hover:rotate-12 transition-transform duration-300">
-            <Briefcase className="w-6 h-6 text-white" />
-        </div>
-        HirePur
-      </Link>
-      
+    <nav className="sticky top-0 z-50 bg-paper/95 border-b border-ink/10 h-[68px] px-5 md:px-10 flex items-center justify-between">
+      <Logo onClick={close} />
+
       {/* Desktop Menu */}
-      <div className="hidden md:flex items-center gap-10 font-bold">
-        {isAuthenticated && <Link to="/dashboard" className="nav-link">Dashboard</Link>}
-        {isAuthenticated && <Link to="/chat" className="nav-link">Messages</Link>}
-        <Link to="/jobs" className="nav-link">Browse Jobs</Link>
-        <Link to="/about" className="nav-link">About</Link>
-        
+      <div className="hidden md:flex items-center gap-9 text-[15px]">
+        {isAuthenticated && <NavLink to="/dashboard" className={navClass}>Dashboard</NavLink>}
+        {isAuthenticated && <NavLink to="/chat" className={navClass}>Messages</NavLink>}
+        <NavLink to="/jobs" className={navClass}>Jobs</NavLink>
+        <NavLink to="/about" className={navClass}>About</NavLink>
+
         {isAuthenticated ? (
-           <div className="flex items-center gap-6">
-                
-                {/* 1. Live Notification Bell & Dropdown */}
+           <div className="flex items-center gap-4 pl-6 border-l border-ink/10">
+
                 <div className="relative" ref={dropdownRef}>
-                    <button 
+                    <button
                         onClick={() => setShowNotifications(!showNotifications)}
-                        className="relative p-2 text-slate-400 hover:text-slate-600 transition-colors duration-200"
+                        className="relative p-2 text-slate-500 hover:text-ink transition-colors"
+                        aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ''}`}
                     >
-                        <Bell className="w-5 h-5"/>
+                        <Bell className="w-[22px] h-[22px]"/>
                         {unreadCount > 0 && (
-                            <span className="absolute top-1 right-1 h-4 min-w-[16px] px-1 bg-red-500 text-white rounded-full text-[9px] font-black flex items-center justify-center animate-pulse">
+                            <span className="absolute top-0.5 right-0.5 h-4 min-w-[16px] px-1 bg-metro-red text-white rounded-full font-mono text-[9px] font-semibold flex items-center justify-center">
                                 {unreadCount}
                             </span>
                         )}
@@ -83,130 +83,103 @@ const Navbar = () => {
 
                     <AnimatePresence>
                         {showNotifications && (
-                            <motion.div 
-                                initial={{ opacity: 0, y: 15 }}
+                            <motion.div
+                                initial={{ opacity: 0, y: 8 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: 15 }}
-                                className="absolute right-0 mt-3 w-80 bg-white border border-slate-100 rounded-3xl p-6 shadow-2xl z-50 max-h-[400px] overflow-y-auto"
+                                exit={{ opacity: 0, y: 8 }}
+                                transition={{ duration: 0.2 }}
+                                className="absolute right-0 mt-3 w-80 bg-surface border border-ink/15 rounded-lg z-50 max-h-[400px] overflow-y-auto"
                             >
-                                <div className="flex justify-between items-center mb-4 border-b border-slate-50 pb-3">
-                                    <h4 className="font-extrabold text-sm text-slate-900 flex items-center gap-1.5">
-                                        Alerts <Sparkles className="w-3.5 h-3.5 text-primary"/>
-                                    </h4>
+                                <div className="flex justify-between items-center px-4 py-3 border-b border-ink/10">
+                                    <span className="label-mono !text-ink">Announcements</span>
                                     {unreadCount > 0 && (
-                                        <button 
-                                            onClick={markAllAsRead}
-                                            className="text-[10px] font-black text-primary uppercase tracking-wider hover:underline"
-                                        >
+                                        <button onClick={markAllAsRead} className="label-mono !text-primary hover:underline">
                                             Mark all read
                                         </button>
                                     )}
                                 </div>
 
-                                <div className="space-y-2">
-                                    {notifications.length === 0 ? (
-                                        <div className="py-8 text-center text-slate-400">
-                                            <p className="text-xs font-bold uppercase tracking-widest text-slate-300">No alerts yet</p>
-                                        </div>
-                                    ) : (
-                                        notifications.slice(0, 5).map(notif => (
-                                            <div 
-                                                key={notif.id}
-                                                onClick={() => {
-                                                    markAsRead(notif.id);
-                                                    setShowNotifications(false);
-                                                }}
-                                                className={`p-3 rounded-2xl text-[11px] font-semibold cursor-pointer border transition-all text-left ${
-                                                    notif.is_read 
-                                                        ? 'bg-slate-50/50 border-transparent text-slate-500' 
-                                                        : 'bg-primary/5 border-primary/10 text-slate-800'
-                                                }`}
-                                            >
-                                                <p className="leading-relaxed">{notif.message}</p>
-                                                <span className="text-[8px] text-slate-400 font-bold block mt-1.5 uppercase">
+                                {notifications.length === 0 ? (
+                                    <p className="px-4 py-10 text-center text-sm text-slate-500">Nothing new on your line.</p>
+                                ) : (
+                                    notifications.slice(0, 5).map(notif => (
+                                        <button
+                                            key={notif.id}
+                                            onClick={() => {
+                                                markAsRead(notif.id);
+                                                setShowNotifications(false);
+                                            }}
+                                            className="w-full text-left px-4 py-3 border-b border-ink/5 last:border-0 hover:bg-slate-50 transition-colors flex gap-3"
+                                        >
+                                            <span className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${notif.is_read ? 'bg-ink/15' : 'bg-primary'}`} />
+                                            <span>
+                                                <span className={`block text-[13px] leading-snug ${notif.is_read ? 'text-slate-500' : 'text-ink'}`}>{notif.message}</span>
+                                                <span className="label-mono !text-[10px] block mt-1">
                                                     {new Date(notif.created_at).toLocaleDateString()}
                                                 </span>
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
+                                            </span>
+                                        </button>
+                                    ))
+                                )}
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
 
-                {/* 2. Profiling Navigation */}
-                <Link to="/profile" className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-2xl border border-slate-100 hover:bg-white hover:border-primary/20 transition-all group">
-                   <div className="w-8 h-8 rounded-full overflow-hidden bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+                <Link to="/profile" className="flex items-center gap-2.5 group" title="Your profile">
+                   <span className="w-9 h-9 rounded-full overflow-hidden bg-slate-100 border border-ink/10 flex items-center justify-center text-slate-600">
                        {user?.profile_pic ? (
                            <img src={user.profile_pic} alt="" className="w-full h-full object-cover" />
                        ) : (
                            <User className="w-4 h-4"/>
                        )}
-                   </div>
-                   <div className="flex flex-col text-left">
-                       <span className="text-sm font-black text-slate-900 leading-none">{user?.name}</span>
-                       <span className="text-[10px] font-bold text-slate-400 mt-1">View Profile</span>
-                   </div>
+                   </span>
+                   <span className="text-sm font-semibold text-ink group-hover:text-primary transition-colors">{user?.name?.split(' ')[0]}</span>
                 </Link>
-                
-                <button onClick={handleLogout} className="text-slate-400 hover:text-red-500 transition-colors p-2">
+
+                <button onClick={handleLogout} className="text-slate-500 hover:text-metro-red transition-colors p-2" aria-label="Log out" title="Log out">
                    <LogOut className="w-5 h-5" />
                 </button>
            </div>
         ) : (
-          <div className="flex items-center gap-6">
-             <Link to="/login" className="text-slate-600 hover:text-primary transition-colors">Login</Link>
-             <Link to="/register" className="btn-primary !px-6 !py-2.5 !text-sm">Sign Up</Link>
+          <div className="flex items-center gap-6 pl-6 border-l border-ink/10">
+             <NavLink to="/login" className={navClass}>Log in</NavLink>
+             <Link to="/register" className="btn-primary !px-5 !py-2.5 !text-sm">
+                <span className="roll"><span data-text="Get a pass">Get a pass</span></span>
+             </Link>
           </div>
         )}
       </div>
 
       {/* Mobile Menu Toggle */}
-      <button className="md:hidden p-2 bg-slate-50 rounded-xl" onClick={() => setIsOpen(!isOpen)}>
-        <Menu className="w-6 h-6 text-slate-600" />
+      <button className="md:hidden p-2 -mr-2" onClick={() => setIsOpen(!isOpen)} aria-label={isOpen ? 'Close menu' : 'Open menu'}>
+        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
       </button>
 
       {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
-           <motion.div 
-             initial={{ opacity: 0, y: -20 }}
+           <motion.div
+             initial={{ opacity: 0, y: -8 }}
              animate={{ opacity: 1, y: 0 }}
-             exit={{ opacity: 0, y: -20 }}
-             className="absolute top-20 left-4 right-4 bg-white/95 backdrop-blur-2xl shadow-2xl rounded-3xl p-6 flex flex-col gap-6 md:hidden border border-slate-100 z-50"
+             exit={{ opacity: 0, y: -8 }}
+             transition={{ duration: 0.2 }}
+             className="absolute top-[68px] inset-x-0 bg-paper border-b border-ink/10 px-5 py-6 flex flex-col gap-1 md:hidden z-50"
            >
-              <Link to="/jobs" className="text-xl font-bold" onClick={() => setIsOpen(false)}>Browse Jobs</Link>
-              <Link to="/about" className="text-xl font-bold" onClick={() => setIsOpen(false)}>About</Link>
-              <hr className="border-slate-100" />
+              {[
+                ...(isAuthenticated ? [['/dashboard', 'Dashboard'], ['/chat', 'Messages'], ['/profile', 'Profile']] : []),
+                ['/jobs', 'Jobs'],
+                ['/about', 'About'],
+              ].map(([to, label]) => (
+                <Link key={to} to={to} onClick={close} className="font-display text-3xl font-bold uppercase py-2 border-b border-ink/10">{label}</Link>
+              ))}
               {isAuthenticated ? (
-                 <>
-                   <Link to="/profile" className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100" onClick={() => setIsOpen(false)}>
-                       <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold overflow-hidden">
-                           {user?.profile_pic ? (
-                               <img src={user.profile_pic} alt="" className="w-full h-full object-cover" />
-                           ) : (
-                               user?.name?.[0]
-                           )}
-                       </div>
-                       <div className="flex flex-col text-left">
-                           <span className="text-sm font-black text-slate-900 leading-none">{user?.name}</span>
-                           <span className="text-[10px] font-bold text-primary mt-1">View Profile</span>
-                       </div>
-                   </Link>
-                   <Link to="/dashboard" className="text-xl font-bold flex items-center gap-3 mt-2" onClick={() => setIsOpen(false)}>
-                       Dashboard
-                   </Link>
-                   <Link to="/chat" className="text-xl font-bold flex items-center gap-3 mt-2" onClick={() => setIsOpen(false)}>
-                       Messages
-                   </Link>
-                   <button onClick={() => { handleLogout(); setIsOpen(false); }} className="text-left text-red-500 text-xl font-bold">Logout</button>
-                 </>
+                <button onClick={() => { handleLogout(); close(); }} className="text-left label-mono !text-metro-red !text-xs pt-4">Log out</button>
               ) : (
-                  <div className="grid grid-cols-2 gap-4">
-                   <Link to="/login" className="btn-outline !text-sm flex justify-center" onClick={() => setIsOpen(false)}>Login</Link>
-                   <Link to="/register" className="btn-primary !text-sm flex justify-center" onClick={() => setIsOpen(false)}>Sign Up</Link>
-                  </div>
+                <div className="grid grid-cols-2 gap-3 pt-5">
+                  <Link to="/login" className="btn-outline !text-sm" onClick={close}>Log in</Link>
+                  <Link to="/register" className="btn-primary !text-sm" onClick={close}>Get a pass</Link>
+                </div>
               )}
            </motion.div>
         )}

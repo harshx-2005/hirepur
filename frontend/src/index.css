@@ -1,26 +1,72 @@
 @import "tailwindcss";
 
+/* HirePur Metro — the city of hiring. Paper, ink, and four transit lines. */
 @theme {
-  --color-primary: #6366f1;
-  --color-primary-dark: #4f46e5;
-  --color-secondary: #06b6d4;
-  --color-background: #ffffff;
-  --color-surface: #f8fafc;
-  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --color-paper: #f4f2ec;
+  --color-surface: #fbfaf6;
+  --color-ink: #121212;
+  --color-background: #f4f2ec;
+
+  /* the four lines; primary = Blue line, secondary = Green line */
+  --color-metro-blue: #0a5bd3;
+  --color-metro-red: #e0322b;
+  --color-metro-green: #1e8e4e;
+  --color-metro-yellow: #f5b700;
+  --color-primary: #0a5bd3;
+  --color-primary-dark: #08479f;
+  --color-secondary: #1e8e4e;
+
+  /* warm greys replace Tailwind's cool slate everywhere it is already used */
+  --color-slate-50: #f6f4ee;
+  --color-slate-100: #edeae2;
+  --color-slate-200: #dedad0;
+  --color-slate-300: #c3beb2;
+  --color-slate-400: #9c978b;
+  --color-slate-500: #75716a;
+  --color-slate-600: #57544e;
+  --color-slate-700: #3f3d39;
+  --color-slate-800: #2a2926;
+  --color-slate-900: #1a1918;
+  --color-slate-950: #121212;
+
+  --font-sans: "Overpass", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Big Shoulders Display", "Overpass", sans-serif;
+  --font-mono: "Overpass Mono", ui-monospace, monospace;
+
+  /* signage, not bubbles: small radii, flat surfaces, restrained weights */
+  --radius-lg: 6px;
+  --radius-xl: 6px;
+  --radius-2xl: 8px;
+  --radius-3xl: 10px;
+  --shadow-lg: 0 1px 0 0 rgb(18 18 18 / 0.04);
+  --shadow-xl: 0 1px 0 0 rgb(18 18 18 / 0.04);
+  --shadow-2xl: 0 1px 0 0 rgb(18 18 18 / 0.05);
+  --font-weight-extrabold: 700;
+  --font-weight-black: 700;
+  --tracking-tighter: -0.01em;
+  --tracking-tight: 0em;
+
+  --ease-metro: cubic-bezier(0.7, 0, 0.2, 1);
 }
 
 @layer base {
   body {
-    @apply bg-background text-slate-900 antialiased;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
-  }
-  
-  /* Focus rings for premium accessibility */
-  *:focus-visible {
-    @apply outline-none ring-4 ring-primary/20 border-primary/20;
+    @apply bg-paper text-ink antialiased;
+    font-size: 16.5px;
   }
 
-  /* Universal cursor-pointer standard for all clickable elements */
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    line-height: 0.95;
+  }
+
+  ::selection { background: var(--color-metro-yellow); color: var(--color-ink); }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
   button,
   [role="button"],
   a,
@@ -33,73 +79,57 @@
   input[type="file"] {
     cursor: pointer;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/70 backdrop-blur-md border border-slate-200/50 shadow-xl shadow-slate-200/50 rounded-3xl p-8 transition-all duration-300;
+    @apply bg-surface border border-ink/10 rounded-xl p-8 transition-colors duration-300;
   }
 
   .btn-primary {
-    @apply bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-2xl font-bold transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-primary/40 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none disabled:transform-none;
+    @apply bg-ink hover:bg-primary text-paper px-6 py-3 rounded-md font-semibold transition-colors duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none;
   }
 
   .btn-outline {
-    @apply bg-white border-2 border-slate-200 hover:border-primary text-slate-600 hover:text-primary px-8 py-3 rounded-2xl font-bold transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none;
+    @apply bg-transparent border border-ink/25 hover:border-ink text-ink px-6 py-3 rounded-md font-semibold transition-colors duration-300 flex items-center justify-center gap-2 disabled:opacity-50 disabled:pointer-events-none;
   }
 
   .input-field {
-    @apply w-full px-5 py-4 rounded-2xl border-2 border-slate-100 bg-slate-50/50 focus:bg-white focus:border-primary focus:outline-none transition-all duration-300 placeholder:text-slate-400 disabled:opacity-50;
+    @apply w-full px-4 py-3 rounded-md border border-ink/15 bg-surface focus:border-ink focus:outline-none transition-colors duration-200 placeholder:text-slate-400 disabled:opacity-50;
   }
 
   .nav-link {
-    @apply text-slate-500 hover:text-primary font-semibold transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-primary after:transition-all hover:after:w-full;
+    @apply text-slate-600 hover:text-ink font-medium transition-colors relative after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-[2px] after:bg-ink after:transition-all hover:after:w-full;
   }
-  
+
   .badge {
-     @apply px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest;
+    @apply px-2 py-0.5 rounded-sm border border-current/25 font-mono text-[11px] font-medium uppercase tracking-wider;
   }
-}
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-::-webkit-scrollbar-track {
-  @apply bg-slate-50;
-}
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
-}
+  /* small mono caption used for metadata: line numbers, dates, salaries */
+  .label-mono {
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-slate-500;
+  }
 
-/* Animations */
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+  /* text roll on hover: wrap text in <span data-text="same text"> */
+  .roll { @apply inline-block overflow-hidden align-top; }
+  .roll > span { @apply inline-block relative; transition: transform 0.5s var(--ease-metro); }
+  .roll > span::after { content: attr(data-text); @apply absolute left-0 top-full; }
+  .group:hover .roll > span, .roll:hover > span { transform: translateY(-100%); }
 }
 
 .gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
+  color: var(--color-primary);
 }
 
-/* Slide in animations for items */
-.slide-in {
-  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-paper); }
+::-webkit-scrollbar-thumb { @apply bg-slate-300 rounded-full; }

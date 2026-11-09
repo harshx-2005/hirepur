@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { motion } from 'framer-motion';
-import { ShieldCheck, Loader2, ArrowRight, Lock, Mail } from 'lucide-react';
+import { ShieldCheck, Loader2, ArrowRight, Lock, Mail } from '../icons';
 
 const adminLoginSchema = z.object({
   email: z.string().email('Admin email is required'),
@@ -50,7 +50,7 @@ const AdminLogin = () => {
         <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-12 shadow-2xl relative overflow-hidden"
+            className="bg-white/5 backdrop-blur-3xl border border-white/10 rounded-xl p-12 shadow-2xl relative overflow-hidden"
         >
             {/* Background Glow */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full -mr-16 -mt-16 blur-3xl"></div>

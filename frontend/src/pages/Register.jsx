@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { motion } from 'framer-motion';
-import { Briefcase, Loader2, ArrowRight, User, Mail, Lock, Building2 } from 'lucide-react';
+import { Briefcase, Loader2, ArrowRight, User, Mail, Lock, Building2 } from '../icons';
 
 // Strict Password Validation Policy
 const passwordValidation = z.string()
@@ -71,32 +71,25 @@ const Register = () => {
         animate={{ opacity: 1, scale: 1 }}
         className="max-w-4xl w-full"
       >
-        <div className="glass-card !p-0 shadow-[0_32px_100px_-20px_rgba(0,0,0,0.1)] overflow-hidden flex flex-col md:flex-row border-none">
+        <div className="glass-card !p-0 overflow-hidden flex flex-col md:flex-row border-none">
             
             {/* Sidebar Branding */}
-            <div className="w-full md:w-[40%] bg-slate-900 p-12 text-white relative flex flex-col justify-between">
-                <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-20 rotate-12 translate-x-12 translate-y-12 overflow-hidden pointer-events-none">
-                    <Briefcase className="w-[300px] h-[300px] text-primary"/>
-                </div>
-                
+            <div className="w-full md:w-[40%] bg-ink p-12 text-paper relative flex flex-col justify-between">
                 <div className="relative z-10">
-                    <Link to="/" className="flex items-center gap-2 text-2xl font-black mb-16">
-                        <div className="bg-primary p-1.5 rounded-xl"><Briefcase className="w-6 h-6"/></div>
-                        HirePur
-                    </Link>
-                    <h2 className="text-4xl font-black tracking-tighter leading-[0.9] mb-6 underline decoration-primary decoration-8 underline-offset-8">Join the Future <br/> of Work.</h2>
-                    <p className="text-slate-400 font-bold text-sm">Create your intelligent profile and start matching with top companies instantly.</p>
+                    <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-metro-yellow">New pass</span>
+                    <h2 className="text-6xl font-black uppercase leading-[0.86] mt-3 mb-6">Pick your <br/> line.</h2>
+                    <p className="text-paper/70 text-sm leading-relaxed max-w-xs">Candidates apply and track every application. Employers post roles and move people through them. One account either way.</p>
                 </div>
 
-                <div className="relative z-10 space-y-4">
-                    <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-xs font-medium leading-relaxed italic">
-                        "The fastest registration experience in the industry. Highly recommend."
-                    </div>
+                <div className="relative z-10 space-y-2" aria-hidden="true">
+                    {['bg-metro-blue', 'bg-metro-red', 'bg-metro-green', 'bg-metro-yellow'].map((c, i) => (
+                        <span key={c} className={`${c} block h-1.5 rounded-full`} style={{ width: `${100 - i * 18}%` }} />
+                    ))}
                 </div>
             </div>
 
             {/* Registration Form */}
-            <div className="flex-1 p-12 bg-white">
+            <div className="flex-1 p-12 bg-surface">
                 <div className="mb-8">
                     <h3 className="text-2xl font-black text-slate-900 tracking-tight">Create Profile</h3>
                     <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-1">Start your journey today</p>
@@ -149,7 +142,7 @@ const Register = () => {
                                     </div>
                                     <div className="flex flex-col gap-1">
                                         <label className="text-[10px] font-black tracking-[0.2em] text-slate-400 uppercase ml-2">Company Size</label>
-                                        <select {...register('company_size')} className="input-field !py-3 shadow-sm border-slate-100 bg-white">
+                                        <select {...register('company_size')} className="input-field !py-3 shadow-sm border-slate-100 bg-surface">
                                             <option value="">Select Size</option>
                                             <option value="1-10">1-10 employees</option>
                                             <option value="11-50">11-50 employees</option>

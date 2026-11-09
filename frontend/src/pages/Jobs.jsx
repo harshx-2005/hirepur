@@ -1,188 +1,179 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import apiClient from '../api/client';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Briefcase, DollarSign, Search, Filter, ChevronRight, Star, SlidersHorizontal, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { MapPin, Search, ArrowRight, ChevronLeft, ChevronRight } from '../icons';
 import { useAuthStore } from '../store/useAuthStore';
+
+const LINE_COLORS = ['#0a5bd3', '#e0322b', '#1e8e4e', '#f5b700'];
 
 const Jobs = () => {
     const { user } = useAuthStore();
-    const [search, setSearch] = useState('');
-    const [location, setLocation] = useState('');
+    const [params] = useSearchParams();
+    const [search, setSearch] = useState(params.get('q') || '');
+    const [location, setLocation] = useState(params.get('location') || '');
     const [page, setPage] = useState(1);
 
     const { data: jobsResponse, isLoading, error } = useQuery({
         queryKey: ['jobs', { location, page }],
         queryFn: async () => {
-            const res = await apiClient.get(`/jobs?location=${location}&page=${page}`);
+            const res = await apiClient.get(`/jobs?location=${encodeURIComponent(location)}&page=${page}`);
             return res.data;
         }
     });
 
     const jobs = jobsResponse?.data || [];
     const pagination = jobsResponse?.pagination || { pages: 1 };
-    
-    const filteredJobs = jobs.filter(job => 
-        job.title.toLowerCase().includes(search.toLowerCase()) || 
-        job.company_name?.toLowerCase().includes(search.toLowerCase())
+
+    const needle = search.toLowerCase();
+    const filteredJobs = jobs.filter(job =>
+        [job.title, job.company_name, job.description, job.skills, job.category]
+            .filter(Boolean).join(' ').toLowerCase().includes(needle)
     );
 
     return (
-        <div className="min-h-screen bg-slate-50/50 py-16 px-6 lg:px-12">
+        <div className="min-h-screen bg-paper py-12 px-5 md:px-10">
             <div className="max-w-7xl mx-auto">
-                <div className="mb-12 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                    <div>
-                        <h1 className="text-5xl font-black tracking-tighter text-slate-900 mb-2">Explore Roles</h1>
-                        <p className="text-slate-500 font-medium">Discover your next career milestone at top-tier companies.</p>
-                    </div>
+                <div className="flex justify-between items-center border-b border-ink pb-3 mb-8">
+                    <span className="label-mono !text-ink">Departures · All lines</span>
+                    {!isLoading && !error && <span className="label-mono">{filteredJobs.length} on this page</span>}
                 </div>
 
-                {/* Advanced Search & Filter Bar */}
-                <div className="bg-white shadow-xl shadow-slate-200/40 rounded-[2.5rem] p-3 flex flex-col lg:flex-row items-center gap-3 border border-slate-100 mb-16">
-                    <div className="flex-1 flex items-center gap-4 px-6 py-4 w-full lg:border-r border-slate-100">
-                        <Search className="text-primary w-6 h-6"/>
-                        <input 
-                            type="text" 
-                            placeholder="Search by role or company..." 
-                            className="w-full bg-transparent border-none focus:outline-none text-lg font-bold text-slate-700 placeholder:text-slate-300"
+                <h1 className="font-display font-black uppercase text-6xl md:text-8xl leading-[0.86] mb-10">Open roles</h1>
+
+                <div className="bg-surface border border-ink rounded-lg flex flex-col md:flex-row overflow-hidden mb-10">
+                    <label className="flex-1 flex items-center gap-3 px-4 py-3.5 border-b md:border-b-0 md:border-r border-ink/15 cursor-text">
+                        <Search className="w-5 h-5 text-slate-500 shrink-0"/>
+                        <input
+                            type="text"
+                            placeholder="Role, company or skill"
+                            aria-label="Role, company or skill"
+                            className="w-full bg-transparent focus:outline-none placeholder:text-slate-400"
                             value={search}
-                            onChange={(e) => {
-                                setSearch(e.target.value);
-                                setPage(1);
-                            }}
+                            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
                         />
-                    </div>
-                    <div className="flex-1 flex items-center gap-4 px-6 py-4 w-full">
-                        <MapPin className="text-secondary w-6 h-6"/>
-                        <input 
-                            type="text" 
-                            placeholder="Filter by location..." 
-                            className="w-full bg-transparent border-none focus:outline-none text-lg font-bold text-slate-700 placeholder:text-slate-300"
+                    </label>
+                    <label className="flex-1 flex items-center gap-3 px-4 py-3.5 cursor-text">
+                        <MapPin className="w-5 h-5 text-slate-500 shrink-0"/>
+                        <input
+                            type="text"
+                            placeholder="City or remote"
+                            aria-label="City or remote"
+                            className="w-full bg-transparent focus:outline-none placeholder:text-slate-400"
                             value={location}
-                            onChange={(e) => {
-                                setLocation(e.target.value);
-                                setPage(1);
-                            }}
+                            onChange={(e) => { setLocation(e.target.value); setPage(1); }}
                         />
-                    </div>
+                    </label>
                 </div>
 
-                {/* Job Grid */}
-                <AnimatePresence mode="popLayout">
-                    {isLoading ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            {[1, 2, 3, 4, 5, 6].map(i => (
-                                <div key={i} className="glass-card animate-pulse h-80 bg-slate-100"></div>
+                {/* column heads, like a departure board */}
+                <div className="hidden md:grid grid-cols-12 gap-4 px-5 pb-2 label-mono !text-[10px]">
+                    <span className="col-span-5">Role</span>
+                    <span className="col-span-3">Where</span>
+                    <span className="col-span-2">Pay</span>
+                    <span className="col-span-2 text-right">Board</span>
+                </div>
+
+                {isLoading ? (
+                    <div className="border-t border-ink/15">
+                        {[1, 2, 3, 4, 5, 6].map(i => (
+                            <div key={i} className="h-[76px] border-b border-ink/10 flex items-center gap-4 px-5">
+                                <span className="w-3 h-3 rounded-full bg-slate-200" />
+                                <span className="h-4 w-1/3 bg-slate-200/70 rounded-sm animate-pulse" />
+                            </div>
+                        ))}
+                    </div>
+                ) : error ? (
+                    <div className="border border-metro-red/40 bg-metro-red/5 rounded-lg px-6 py-10">
+                        <span className="label-mono !text-metro-red">Service disruption</span>
+                        <h3 className="font-display font-extrabold uppercase text-3xl mt-2">Couldn't load jobs.</h3>
+                        <p className="text-slate-600 mt-2">The server didn't answer. Check that the backend is running, then refresh.</p>
+                    </div>
+                ) : filteredJobs.length === 0 ? (
+                    <div className="border-t border-ink/15 py-20 text-center">
+                        <span className="label-mono">No departures</span>
+                        <h3 className="font-display font-extrabold uppercase text-4xl mt-2">Nothing matches that search</h3>
+                        <p className="text-slate-600 mt-2">Try a shorter role name, or clear the city.</p>
+                    </div>
+                ) : (
+                    <>
+                        <div className="border-t border-ink/15">
+                            {filteredJobs.map((job, index) => (
+                                <JobRow key={job.id} job={job} index={index} user={user}/>
                             ))}
                         </div>
-                    ) : error ? (
-                        <motion.div initial={{opacity:0}} animate={{opacity:1}} className="text-center py-24 glass-card bg-red-50/50 border-red-100">
-                            <p className="text-red-500 font-black uppercase tracking-widest text-[10px]">Transmission Error</p>
-                            <h3 className="text-xl font-bold mt-2">Failed to sync job data.</h3>
-                        </motion.div>
-                    ) : filteredJobs.length === 0 ? (
-                        <motion.div initial={{opacity:0, scale:0.9}} animate={{opacity:1, scale:1}} className="text-center py-32 glass-card">
-                            <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-200">
-                                <Search className="w-10 h-10"/>
-                            </div>
-                            <h3 className="text-2xl font-black text-slate-900">No matches found</h3>
-                            <p className="text-slate-400 font-medium">Try broadening your search criteria.</p>
-                        </motion.div>
-                    ) : (
-                        <div className="space-y-16">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {filteredJobs.map((job, index) => (
-                                    <JobCard key={job.id} job={job} index={index} user={user}/>
+
+                        {pagination.pages > 1 && (
+                            <div className="mt-10 flex justify-center items-center gap-2">
+                                <button
+                                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                                    disabled={page === 1}
+                                    className="btn-outline !p-2.5 disabled:opacity-30"
+                                    aria-label="Previous page"
+                                >
+                                    <ChevronLeft className="w-5 h-5"/>
+                                </button>
+                                {[...Array(pagination.pages)].map((_, i) => (
+                                    <button
+                                        key={i + 1}
+                                        onClick={() => setPage(i + 1)}
+                                        aria-current={page === i + 1 ? 'page' : undefined}
+                                        className={`w-10 h-10 rounded-md font-mono text-sm transition-colors ${
+                                            page === i + 1 ? 'bg-ink text-paper' : 'text-slate-600 hover:bg-slate-100'
+                                        }`}
+                                    >
+                                        {String(i + 1).padStart(2, '0')}
+                                    </button>
                                 ))}
+                                <button
+                                    onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
+                                    disabled={page === pagination.pages}
+                                    className="btn-outline !p-2.5 disabled:opacity-30"
+                                    aria-label="Next page"
+                                >
+                                    <ChevronRight className="w-5 h-5"/>
+                                </button>
                             </div>
-                            
-                            {/* Pagination */}
-                            {pagination.pages > 1 && (
-                                <div className="mt-16 flex justify-center items-center gap-4">
-                                    <button 
-                                        onClick={() => setPage(p => Math.max(1, p - 1))}
-                                        disabled={page === 1}
-                                        className="btn-outline !rounded-full p-4 disabled:opacity-30"
-                                    >
-                                        <ChevronRight className="w-5 h-5 rotate-180"/>
-                                    </button>
-                                    <div className="flex gap-2">
-                                        {[...Array(pagination.pages)].map((_, i) => (
-                                            <button
-                                                key={i + 1}
-                                                onClick={() => setPage(i + 1)}
-                                                className={`w-12 h-12 rounded-full font-black text-sm transition-all ${
-                                                    page === i + 1 
-                                                        ? 'bg-primary text-white shadow-lg shadow-primary/20 bg-blue-600' 
-                                                        : 'bg-white text-slate-400 hover:bg-slate-50'
-                                                }`}
-                                            >
-                                                {i + 1}
-                                            </button>
-                                        ))}
-                                    </div>
-                                    <button 
-                                        onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
-                                        disabled={page === pagination.pages}
-                                        className="btn-outline !rounded-full p-4 disabled:opacity-30"
-                                    >
-                                        <ChevronRight className="w-5 h-5"/>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </AnimatePresence>
+                        )}
+                    </>
+                )}
             </div>
         </div>
     );
 };
 
-const JobCard = ({ job, index, user }) => {
+const JobRow = ({ job, index, user }) => {
     const isCandidate = !user || user.role === 'job_seeker';
+    const color = LINE_COLORS[job.id % LINE_COLORS.length] || LINE_COLORS[0];
 
     return (
-        <motion.div 
-            layout
-            initial={{ opacity: 0, y: 30 }}
+        <motion.div
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05 }}
-            className="glass-card flex flex-col hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 group relative"
+            transition={{ delay: Math.min(index, 10) * 0.04, duration: 0.35 }}
         >
-            <div className="absolute top-8 right-8 text-slate-200 group-hover:text-primary transition-colors">
-                <Star className="w-5 h-5"/>
-            </div>
-
-            <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 bg-slate-50 rounded-[1.25rem] flex items-center justify-center border border-slate-100 font-black text-slate-400 text-xl group-hover:bg-primary/5 group-hover:text-primary transition-colors">
-                     {job.company_name?.[0]}
+            <Link to={`/jobs/${job.id}`}
+                className="group grid grid-cols-12 gap-x-4 gap-y-1 items-center px-5 py-5 border-b border-ink/10 hover:bg-surface transition-colors">
+                <div className="col-span-12 md:col-span-5 flex items-center gap-4 min-w-0">
+                    <span className="w-3 h-3 rounded-full border-[3px] shrink-0 bg-surface" style={{ borderColor: color }} />
+                    <div className="min-w-0">
+                        <h3 className="font-sans text-[17px] font-semibold leading-tight truncate group-hover:text-primary transition-colors">{job.title}</h3>
+                        <p className="text-sm text-slate-500 truncate">{job.company_name}</p>
+                    </div>
                 </div>
-                <div>
-                     <span className="badge bg-slate-50 text-slate-500 mb-1 inline-block">{job.job_type || 'Full-time'}</span>
-                     <h3 className="text-xl font-black text-slate-900 group-hover:text-primary transition-colors line-clamp-1">{job.title}</h3>
+                <div className="col-span-6 md:col-span-3 pl-7 md:pl-0 text-sm text-slate-600 truncate">
+                    {job.location}{job.work_mode ? ` · ${job.work_mode}` : ''}
+                    <span className="badge text-slate-500 ml-2 hidden lg:inline-block">{job.job_type || 'Full-time'}</span>
                 </div>
-            </div>
-
-            <div className="space-y-4 mb-8 flex-grow">
-                <div className="flex items-center gap-2 text-slate-500 font-bold text-xs uppercase tracking-widest">
-                    <MapPin className="w-4 h-4 text-slate-300"/> {job.location} • {job.work_mode || 'Remote'}
+                <div className="col-span-6 md:col-span-2 font-mono text-sm text-ink truncate">
+                    {job.salary_range ? `₹ ${job.salary_range}` : <span className="text-slate-400">Not listed</span>}
                 </div>
-                <div className="flex items-center gap-2 text-primary font-bold text-xs uppercase tracking-widest text-[#2563eb]">
-                    <span className="text-lg">₹</span> {job.salary_range || 'Competitive Pay'}
+                <div className="hidden md:flex col-span-2 justify-end items-center gap-2 text-sm font-semibold">
+                    {isCandidate ? 'Apply' : 'Open'}
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </div>
-            </div>
-
-            <div className="flex gap-4 pt-8 border-t border-slate-50">
-                {isCandidate ? (
-                    <>
-                        <Link to={`/jobs/${job.id}`} className="btn-outline !py-3 !px-0 flex-1 !text-sm flex items-center justify-center border-slate-200 border text-slate-700 hover:bg-slate-50 rounded-xl">View Insights</Link>
-                        <Link to={`/jobs/${job.id}`} className="btn-primary !py-3 !px-0 flex-1 !text-sm flex items-center justify-center bg-blue-600 text-white rounded-xl">Apply <ArrowRight className="w-4 h-4 ml-2"/></Link>
-                    </>
-                ) : (
-                    <Link to={`/jobs/${job.id}`} className="btn-primary w-full !py-3 !px-0 !text-sm flex items-center justify-center bg-blue-600 text-white rounded-xl">View Insights & Analytics <ArrowRight className="w-4 h-4 ml-2"/></Link>
-                )}
-            </div>
+            </Link>
         </motion.div>
     );
 };

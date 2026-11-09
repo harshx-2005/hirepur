@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '../store/useAuthStore';
 import apiClient from '../api/client';
 import { motion } from 'framer-motion';
-import { Briefcase, Loader2, KeyRound, ArrowRight } from 'lucide-react';
+import { Briefcase, Loader2, KeyRound, ArrowRight } from '../icons';
 
 const VerifyOtp = () => {
     const [searchParams] = useSearchParams();
@@ -167,7 +167,7 @@ const VerifyOtp = () => {
                                 ref={(el) => (inputRefs.current[idx] = el)}
                                 type="text"
                                 maxLength="1"
-                                className="w-12 h-14 bg-slate-50 hover:bg-slate-100/50 focus:bg-white text-center text-xl font-black text-slate-900 border-2 border-slate-100 focus:border-primary focus:outline-none rounded-2xl shadow-sm transition-all focus:scale-105"
+                                className="w-12 h-14 bg-slate-50 hover:bg-slate-100/50 focus:bg-surface text-center text-xl font-black text-slate-900 border-2 border-slate-100 focus:border-primary focus:outline-none rounded-2xl shadow-sm transition-all focus:scale-105"
                                 value={digit}
                                 onChange={(e) => handleChange(e.target, idx)}
                                 onKeyDown={(e) => handleKeyDown(e, idx)}

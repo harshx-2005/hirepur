@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Briefcase } from 'lucide-react';
+import { motion, AnimatePresence, MotionConfig } from 'framer-motion';
+import { LogoMark } from './components/Logo';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -55,28 +55,26 @@ const App = () => {
 
   if (isCheckingAuth) {
       return (
-          <div className="min-h-screen bg-white flex items-center justify-center">
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center gap-6"
-              >
-                  <div className="bg-primary p-4 rounded-[2rem] shadow-2xl shadow-primary/20 animate-bounce">
-                      <Briefcase className="w-12 h-12 text-white" />
+          <div className="min-h-screen bg-paper flex items-center justify-center">
+              <div className="flex flex-col items-center gap-5 w-48">
+                  <LogoMark className="w-12 h-12" />
+                  {/* a train crossing the line while auth is checked */}
+                  <div className="relative w-full h-[3px] bg-ink/10 rounded-full overflow-hidden">
+                      <motion.span className="absolute inset-y-0 w-1/3 bg-primary rounded-full"
+                        initial={{ left: '-33%' }} animate={{ left: '100%' }}
+                        transition={{ duration: 1.1, repeat: Infinity, ease: [0.7, 0, 0.2, 1] }} />
                   </div>
-                  <div className="flex flex-col items-center">
-                      <h1 className="text-3xl font-black tracking-tighter text-slate-900">HirePur</h1>
-                      <p className="text-xs font-black uppercase tracking-[0.3em] text-slate-300 mt-1 ml-1">AI Recruitment</p>
-                  </div>
-              </motion.div>
+                  <span className="label-mono">Now arriving</span>
+              </div>
           </div>
       );
   }
 
   return (
     <QueryClientProvider client={queryClient}>
+      <MotionConfig reducedMotion="user">
         <Router>
-          <div className="flex flex-col min-h-screen bg-background">
+          <div className="flex flex-col min-h-screen bg-paper">
             <Navbar />
             <main className="flex-grow">
                 <AnimatePresence mode="wait">
@@ -130,6 +128,7 @@ const App = () => {
             <Footer />
           </div>
         </Router>
+      </MotionConfig>
     </QueryClientProvider>
   );
 }

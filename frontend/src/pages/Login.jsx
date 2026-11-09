@@ -6,7 +6,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuthStore } from '../store/useAuthStore';
 import { motion } from 'framer-motion';
-import { Briefcase, Loader2, ArrowRight, ShieldCheck, Mail, Lock } from 'lucide-react';
+import { Loader2, ArrowRight, Mail, Lock } from '../icons';
+import MetroLine from '../components/MetroLine';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -56,21 +57,13 @@ const Login = () => {
                initial={{ opacity: 0, x: -20 }}
                animate={{ opacity: 1, x: 0 }}
             >
-                <div className="bg-primary p-3 rounded-2xl w-fit mb-8 shadow-xl shadow-primary/20">
-                    <Briefcase className="w-8 h-8 text-white"/>
-                </div>
-                <h1 className="text-6xl font-black tracking-tighter text-slate-900 leading-none mb-6">Welcome Back <br/> to <span className="gradient-text">HirePur.</span></h1>
-                <p className="text-xl text-slate-400 font-medium max-w-sm mb-12">Login to manage your applications and discover AI-powered career growth.</p>
-                
-                <div className="space-y-6">
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-primary"><ShieldCheck className="w-5 h-5"/></div>
-                        <p className="font-bold text-slate-700">Bank-grade security protocols</p>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-secondary"><Loader2 className="w-5 h-5"/></div>
-                        <p className="font-bold text-slate-700">99.9% Uptime availability</p>
-                    </div>
+                <span className="label-mono">Return journey</span>
+                <h1 className="text-7xl font-black uppercase leading-[0.86] mt-3 mb-6">Welcome <br/> back.</h1>
+                <p className="text-lg text-slate-600 max-w-sm mb-12">Log in to see where each of your applications stands.</p>
+
+                <div className="max-w-sm border-t border-ink/15 pt-6">
+                    <span className="label-mono block mb-4">Example · Frontend developer, Pune</span>
+                    <MetroLine status="interview" />
                 </div>
             </motion.div>
         </div>
@@ -84,7 +77,7 @@ const Login = () => {
             <div className="glass-card !p-12 shadow-2xl shadow-slate-200/50">
                 <div className="mb-10">
                     <h2 className="text-3xl font-black text-slate-900 tracking-tight">Sign In</h2>
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Access your professional dashboard</p>
+                    <p className="text-slate-400 font-bold uppercase tracking-widest text-[10px] mt-2">Email and password</p>
                 </div>
 
                 <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
@@ -132,7 +125,7 @@ const Login = () => {
                     >
                         {isSubmitting ? <Loader2 className="w-6 h-6 animate-spin mx-auto" /> : (
                             <>
-                                Authenticate Securely <ArrowRight className="w-5 h-5 group-hover:ml-3 transition-all"/>
+                                Log in <ArrowRight className="w-5 h-5 group-hover:ml-3 transition-all"/>
                             </>
                         )}
                     </button>
@@ -140,7 +133,7 @@ const Login = () => {
 
                 <div className="mt-10 pt-10 border-t border-slate-50 text-center">
                     <p className="text-slate-400 font-bold text-xs">
-                        Don't have an account? <Link to="/register" className="text-primary hover:underline ml-1">Create free profile</Link>
+                        Don't have an account? <Link to="/register" className="text-primary hover:underline ml-1">Create an account</Link>
                     </p>
                 </div>
             </div>

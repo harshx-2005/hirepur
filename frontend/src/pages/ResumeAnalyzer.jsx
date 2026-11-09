@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import apiClient from '../api/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldCheck, Search, FileText, BarChart3, ChevronRight, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { ShieldCheck, Search, FileText, BarChart3, ChevronRight, CheckCircle, AlertCircle, RefreshCw } from '../icons';
 import ReactMarkdown from 'react-markdown';
 
 const ResumeAnalyzer = () => {
@@ -125,12 +125,12 @@ const ResumeAnalyzer = () => {
                     </div>
                 </div>
 
-                <div className="mt-12 p-8 bg-gradient-to-r from-primary to-secondary rounded-3xl text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
+                <div className="mt-12 p-8 bg-ink rounded-3xl text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl">
                     <div className="max-w-md">
                         <h3 className="text-2xl font-bold mb-2">Want to improve your score?</h3>
                         <p className="text-white/80">Use our AI Resume Builder to tailor your experience specifically for this job description.</p>
                     </div>
-                    <button className="bg-white text-primary px-8 py-4 rounded-2xl font-black text-lg flex items-center gap-2 hover:scale-105 transition active:scale-95 shadow-lg">
+                    <button className="bg-surface text-primary px-8 py-4 rounded-2xl font-black text-lg flex items-center gap-2 hover:scale-105 transition active:scale-95 shadow-lg">
                         Go to Builder <ChevronRight className="w-5 h-5"/>
                     </button>
                 </div>

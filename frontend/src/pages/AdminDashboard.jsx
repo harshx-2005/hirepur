@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Users, Briefcase, FileText, BarChart3, ShieldCheck, ChevronRight, Activity, Search } from 'lucide-react';
+import { Users, Briefcase, FileText, BarChart3, ShieldCheck, ChevronRight, Activity, Search } from '../icons';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
 
@@ -39,7 +39,6 @@ const AdminLoader = () => {
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20" />
             
             {/* Glowing cyan blur behind the scanner */}
-            <div className="absolute w-[400px] h-[400px] rounded-full bg-primary/10 blur-[100px] -z-10" />
 
             <div className="relative flex items-center justify-center w-64 h-64">
                 {/* 1. Rotating Outer Ring (Dashed, clockwise) */}
@@ -67,14 +66,14 @@ const AdminLoader = () => {
                 <motion.div
                     animate={{ y: [-70, 70, -70] }}
                     transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                    className="absolute left-10 right-10 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_8px_#3b82f6] z-10"
+                    className="absolute left-10 right-10 h-0.5 bg-primary z-10"
                 />
 
                 {/* Center Glowing Shield Check Icon */}
                 <motion.div
                     animate={{ scale: [0.95, 1.05, 0.95] }}
                     transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                    className="bg-primary/20 p-5 rounded-[2rem] border border-primary/30 shadow-2xl shadow-primary/50 relative z-20 flex items-center justify-center"
+                    className="bg-primary/20 p-5 rounded-xl border border-primary/30 shadow-2xl shadow-primary/50 relative z-20 flex items-center justify-center"
                 >
                     <ShieldCheck className="w-12 h-12 text-primary drop-shadow-[0_0_12px_#3b82f6]" />
                 </motion.div>
@@ -190,7 +189,7 @@ const AdminDashboard = () => {
     if (error) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-6">
-                <div className="bg-white p-12 rounded-[3rem] shadow-xl border border-slate-100 text-center max-w-md">
+                <div className="bg-surface p-12 rounded-xl shadow-xl border border-slate-100 text-center max-w-md">
                     <ShieldCheck className="w-16 h-16 text-red-500 mx-auto mb-6" />
                     <h2 className="text-2xl font-black text-slate-900 mb-2">Access Resticted</h2>
                     <p className="text-slate-500 mb-8">{error}</p>
@@ -203,7 +202,7 @@ const AdminDashboard = () => {
     return (
         <div className="min-h-screen bg-slate-50/50 flex">
             {/* Sidebar */}
-            <aside className="w-64 bg-white border-r border-slate-200 p-6 flex flex-col gap-8">
+            <aside className="w-64 bg-surface border-r border-slate-200 p-6 flex flex-col gap-8">
                 <div className="flex items-center gap-3 px-2">
                     <div className="bg-primary p-2 rounded-xl">
                         <ShieldCheck className="w-6 h-6 text-white" />
@@ -248,7 +247,7 @@ const AdminDashboard = () => {
                                 placeholder="Search Users or Jobs..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-2.5 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/10 transition w-64"
+                                className="bg-surface border border-slate-200 rounded-2xl pl-10 pr-4 py-2.5 text-sm font-medium outline-none focus:ring-2 focus:ring-primary/10 transition w-64"
                             />
                         </div>
                     </div>
@@ -269,7 +268,7 @@ const AdminDashboard = () => {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: idx * 0.1 }}
-                                    className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm"
+                                    className="bg-surface p-8 rounded-xl border border-slate-100 shadow-sm"
                                 >
                                     <div className="flex justify-between items-start mb-4">
                                         <div className={`p-4 rounded-2xl bg-slate-50`}>
@@ -283,7 +282,7 @@ const AdminDashboard = () => {
                         </div>
 
                         {/* Recent Users Table */}
-                        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+                        <div className="bg-surface rounded-xl border border-slate-100 shadow-sm overflow-hidden">
                             <div className="p-8 border-b border-slate-50 flex justify-between items-center">
                                 <h3 className="font-black text-slate-900">Recent Users</h3>
                                 <button 
@@ -327,7 +326,7 @@ const AdminDashboard = () => {
                         </div>
 
                         {/* Recent Jobs */}
-                        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+                        <div className="bg-surface rounded-xl border border-slate-100 shadow-sm overflow-hidden">
                             <div className="p-8 border-b border-slate-50 flex justify-between items-center">
                                 <h3 className="font-black text-slate-900">Recent Job Postings</h3>
                                 <button 
@@ -353,7 +352,7 @@ const AdminDashboard = () => {
                 )}
 
                 {activeTab === 'users' && (
-                    <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+                    <div className="bg-surface rounded-xl border border-slate-100 shadow-sm overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead className="bg-slate-50">
@@ -402,7 +401,7 @@ const AdminDashboard = () => {
                 {activeTab === 'jobs' && (
                     <div className="grid gap-6">
                         {jobs.map((job) => (
-                            <div key={job.id} className="bg-white p-6 rounded-3xl border border-slate-100 flex justify-between items-center group hover:border-primary/20 transition-all">
+                            <div key={job.id} className="bg-surface p-6 rounded-3xl border border-slate-100 flex justify-between items-center group hover:border-primary/20 transition-all">
                                 <Link to={`/jobs/${job.id}`} className="flex-grow block text-left group-hover:opacity-90">
                                     <h4 className="text-xl font-bold text-slate-900 group-hover:text-primary transition-colors hover:underline">{job.title}</h4>
                                     <div className="flex items-center gap-4 mt-2">

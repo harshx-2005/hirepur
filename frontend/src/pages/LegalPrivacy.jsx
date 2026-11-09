@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 const PrivacyPolicy = () => {
     return (
-        <div className="min-h-screen bg-white py-20 px-6 lg:px-12">
+        <div className="min-h-screen bg-paper py-20 px-6 lg:px-12">
             <div className="max-w-4xl mx-auto">
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
 
                     <section className="space-y-6">
                         <h2 className="text-2xl font-black text-slate-900 uppercase tracking-widest border-b-4 border-primary/10 pb-2 inline-block">1. Introduction</h2>
-                        <p className="text-slate-600 leading-relaxed font-medium">Welcome to HirePur. We value your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and safeguard your information when you use our AI-powered recruitment platform.</p>
+                        <p className="text-slate-600 leading-relaxed font-medium">Welcome to HirePur. We value your privacy and are committed to protecting your personal data. This policy explains how we collect, use, and safeguard your information when you use HirePur.</p>
                     </section>
 
                     <section className="space-y-6">
@@ -31,7 +31,7 @@ const PrivacyPolicy = () => {
 
                     <section className="space-y-6">
                         <h2 className="text-2xl font-black text-slate-900 uppercase tracking-widest border-b-4 border-primary/10 pb-2 inline-block">3. How We Use Your Data</h2>
-                        <p className="text-slate-600 leading-relaxed font-medium">We use your data to provide AI-powered job matching, generate resumes, and provide interview feedback. We do not sell your personal data to third parties. Your data is used exclusively to enhance your recruitment experience on HirePur.</p>
+                        <p className="text-slate-600 leading-relaxed font-medium">We use your data to match you with jobs, generate resumes, and provide interview feedback. We do not sell your personal data to third parties. Your data is used exclusively to enhance your recruitment experience on HirePur.</p>
                     </section>
 
                     <section className="space-y-6">
